@@ -19,7 +19,7 @@ Walk them through it one step at a time. Don't dump the whole list. Ask, wait fo
 1. **Check prerequisites.** Ask whether they have each of these, and explain any they don't understand:
    - Network reach to the server from this computer (office network or VPN). A quick test: can they open the Admin Console in a browser?
    - FileMaker Server Admin Console username and password.
-   - OttoFMS admin login or API key, only if OttoFMS is installed.
+   - OttoFMS uses the same Admin Console login. Separate OttoFMS credentials only if the client set them up differently.
    - Remote desktop access to the server: RDP for Windows, Screen Sharing or similar for Mac. Admin rights are best.
    - A Full Access login for each hosted file, or a client admin willing to export the XML.
    - Python 3.10 or later on this computer (`python --version`). If missing, help them install it, then run `pip install -r requirements.txt`.
@@ -62,7 +62,7 @@ If they get stuck, the human-readable version of all of this is `docs/consultant
 | fms-file-audit | Accounts-only XML: accounts, privilege sets, extended privileges |
 | fms-report | Building the HTML and PDF report |
 
-Reference skills (FileMaker Admin API, OttoFMS admin, FileMaker XML structure) are also in `.claude/skills/`. Read them when you need API or XML details.
+Reference skills `fm-admin-reference`, `ottofms-reference` and `fm-xml-reference` are copied from RCC's [rcc-fm](https://github.com/FMTrainingTV-AI/rcc-fm) plugin. Read them when you need API or XML details. Their driver scripts are not included and must not be used here: the audit only reads.
 
 ## Status
 
@@ -70,6 +70,6 @@ Version 0.1. The commands work and are tested against fictitious sample data (`p
 
 - If the Admin API returns fields the collector doesn't recognise, the affected checks show Not checked. Say so, and look at `server_raw.json` in the audit folder to see what came back.
 - If the XML parser finds no accounts, the export format may differ from what it expects. Don't guess at results; tell the consultant.
-- OttoFMS collection isn't built yet; SRV-09 always shows Not checked.
+- OttoFMS collection reads the version, licence and API key labels and expiry dates (never the key secrets). It is built from facts verified on OttoFMS 4.18 but not yet run against a client server.
 
 Never work around a failing command by editing findings or the report by hand.

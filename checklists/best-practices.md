@@ -14,7 +14,7 @@ The plain-language standard the rules in `rules/` implement. Every check returns
 | SRV-06 | Backup schedules | No enabled backup schedule, or last run failed |
 | SRV-07 | Script schedules | Warn on schedules run by a Full Access account |
 | SRV-08 | Plug-ins | Listed for review |
-| SRV-09 | OttoFMS | Old version, or API keys with no expiry |
+| SRV-09 | OttoFMS | Invalid licence, API keys with no expiry, or expired keys still listed |
 
 ## Operating system (pasted script)
 

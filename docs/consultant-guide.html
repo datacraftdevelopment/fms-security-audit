@@ -143,7 +143,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   <tbody>
     <tr><td>Network reach to the server (office network or VPN)</td><td>Client</td><td>Admin API and OttoFMS over HTTPS</td></tr>
     <tr><td>FMS Admin Console username and password</td><td>Client</td><td>Server checklist</td></tr>
-    <tr><td>OttoFMS admin login or a temporary API key, if OttoFMS is installed</td><td>Client</td><td>OttoFMS checks</td></tr>
+    <tr><td>Separate OttoFMS credentials, only if OttoFMS doesn't use the Admin Console login</td><td>Client</td><td>OttoFMS checks</td></tr>
     <tr><td>Remote desktop access: RDP for Windows, Screen Sharing or similar for Mac, ideally as an administrator</td><td>Client</td><td>OS checklist</td></tr>
     <tr><td>A Full Access login per file, or the client's admin to export the XML</td><td>Client</td><td>File audits</td></tr>
     <tr><td>Signed engagement letter, including the AI-processing line</td><td>RCC</td><td>Before any access</td></tr>
@@ -268,7 +268,7 @@ sha256: 9f2c...e41a
   <li>Report reviewed end to end, summary written</li>
   <li>PDF delivered to the client's named contact</li>
   <li><code>audit logout</code> run; nothing stored in your keychain for this client</li>
-  <li>Client asked to rotate the Admin Console password and revoke any temporary OttoFMS key</li>
+  <li>Client asked to rotate the Admin Console password</li>
   <li>Engagement folder copied to RCC client storage</li>
   <li>Local engagement folder deleted after 90 days</li>
   <li><code>git status</code> clean: nothing from the engagement staged</li>

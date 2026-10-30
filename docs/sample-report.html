@@ -95,9 +95,9 @@ footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--line);
 <p>Example Co&#39;s server is backed up nightly and its Inventory file is close to how it was set up, but security has drifted since. The most serious issues are an out-of-date FileMaker Server version, a firewall profile turned off, one file without encryption at rest, and the Invoices file, where 9 of 14 accounts have Full Access and everyday staff can use the Data API. The Contacts file also allows Guest access. None of these needs downtime to fix except the server update.</p>
 <div class="tally" role="list" aria-label="Results across 45 checks">
   <div class="f" role="listitem"><b>10</b>Fail</div>
-  <div class="w" role="listitem"><b>10</b>Warn</div>
+  <div class="w" role="listitem"><b>11</b>Warn</div>
   <div class="p" role="listitem"><b>24</b>Pass</div>
-  <div class="n" role="listitem"><b>1</b>Not checked</div>
+  <div class="n" role="listitem"><b>0</b>Not checked</div>
 </div>
 <p class="muted">45 checks: 9 server, 9 operating system, and 9 for each of 3 files.</p>
 
@@ -123,7 +123,7 @@ footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--line);
     <tr><td class="id">SRV-06</td><td>Backup schedules</td><td><span class="s pass">Pass</span></td><td>1 enabled backup schedule, last run succeeded.</td></tr>
     <tr><td class="id">SRV-07</td><td>Script schedules</td><td><span class="s warn">Warn</span></td><td>&#34;Nightly import&#34; runs as Admin, which has Full Access.</td></tr>
     <tr><td class="id">SRV-08</td><td>Plug-ins</td><td><span class="s pass">Pass</span></td><td>2 plug-ins installed, listed in the appendix for review.</td></tr>
-    <tr><td class="id">SRV-09</td><td>OttoFMS</td><td><span class="s nc">Not checked</span></td><td>OttoFMS is not installed.</td></tr>
+    <tr><td class="id">SRV-09</td><td>OttoFMS</td><td><span class="s warn">Warn</span></td><td>OttoFMS 4.18.2: 1 API key never expires (Old integration).</td></tr>
   </tbody>
 </table>
 </div>
@@ -298,6 +298,8 @@ footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--line);
   <li><b>SSL certificate.</b> Install a certificate from a trusted authority for the server&#39;s hostname and renew it before it expires.</li>
 
   <li><b>Script schedules.</b> Run scheduled scripts under a dedicated account with only the privileges the script needs.</li>
+
+  <li><b>OttoFMS.</b> Keep OttoFMS up to date and give every API key an expiry date.</li>
 
 </ol>
 

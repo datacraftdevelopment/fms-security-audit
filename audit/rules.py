@@ -144,7 +144,24 @@ def srv_09(ctx, p):
         return NC, "OttoFMS is not installed."
     if not ctx.otto:
         return NC, "OttoFMS settings were not collected."
-    return NC, "OttoFMS checks are not implemented yet."
+    o = ctx.otto
+    problems = []
+    if o.get("license_valid") is False:
+        problems.append("the OttoFMS licence is not valid")
+    keys = o.get("api_keys")
+    if keys is None:
+        return NC, f"OttoFMS {o.get('version') or ''} found, but its API keys could not be read.".replace("  ", " ")
+    today = ctx.today.isoformat()
+    no_expiry = [k.get("label") or "unnamed" for k in keys if not k.get("expiration")]
+    expired = [k.get("label") or "unnamed" for k in keys if k.get("expiration") and str(k["expiration"])[:10] < today]
+    if no_expiry:
+        problems.append(f"{len(no_expiry)} API key{' never expires' if len(no_expiry) == 1 else 's never expire'} ({', '.join(no_expiry)})")
+    if expired:
+        problems.append(f"{len(expired)} expired API key{'s' if len(expired) != 1 else ''} still listed ({', '.join(expired)})")
+    version = f"OttoFMS {o['version']}" if o.get("version") else "OttoFMS"
+    if problems:
+        return WARN, f"{version}: " + "; ".join(problems) + "."
+    return PASS, f"{version}, {len(keys)} API key{'s' if len(keys) != 1 else ''}, all with an expiry date."
 
 
 # ---------- operating system ----------

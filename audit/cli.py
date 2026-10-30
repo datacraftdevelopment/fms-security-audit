@@ -55,7 +55,8 @@ def cmd_collect(a):
     else:
         from audit.collect import ottofms
 
-        ottofms.collect(a.host, out)
+        ottofms.collect(a.host, out, a.allow_untrusted_cert)
+        print(f"Wrote {out / 'otto.json'}")
 
 
 def cmd_os_script(a):
@@ -114,7 +115,7 @@ def main(argv=None):
 
     s = sub.add_parser("login", help="store credentials in your keychain (run in your own terminal)")
     s.add_argument("host")
-    s.add_argument("--otto", action="store_true", help="also store OttoFMS credentials")
+    s.add_argument("--otto", action="store_true", help="also store separate OttoFMS credentials (only if they differ from the Admin Console ones)")
     s.set_defaults(fn=cmd_login)
 
     s = sub.add_parser("logout", help="delete stored credentials")

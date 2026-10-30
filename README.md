@@ -2,13 +2,13 @@
 
 A best-practice security audit for a FileMaker Server and the files it hosts, run by a consultant from their own laptop with Claude Code or Codex. You get a dated report with three parts: a server checklist, an operating system checklist, and an account and privilege audit for each file.
 
-> **Status: version 0.1.** Everything runs and is tested against fictitious sample data. It has not yet been tried against a live FileMaker Server, so expect some checks to show Not checked until the collector is tuned to real responses. OttoFMS checks are not built yet.
+> **Status: version 0.1.** Everything runs and is tested against fictitious sample data. It has not yet been tried against a live FileMaker Server, so expect some checks to show Not checked until the collector is tuned to real responses.
 
 **[Read the consultant guide](docs/consultant-guide.html)** · **[See a sample report](docs/sample-report.html)** (fictitious client)
 
 ## What it checks
 
-- **Server:** FileMaker Server version, SSL certificate, encryption at rest, web publishing (Data API, OData, WebDirect), backups, schedules, plug-ins, and OttoFMS if installed. Read through the FileMaker Admin API.
+- **Server:** FileMaker Server version, SSL certificate, encryption at rest, web publishing (Data API, OData, WebDirect), backups, schedules, plug-ins, and OttoFMS if installed. Read through the FileMaker Admin API and the OttoFMS API.
 - **Operating system:** listening ports and the program behind each, firewall, OS version and patching, local administrators, disk encryption, antivirus. Read by one script you paste into a remote desktop session.
 - **Files:** Full Access accounts, Guest access, default account names, wide privilege sets, extended privileges such as the Data API. Read from an accounts-only Save as XML export of each file.
 
@@ -28,7 +28,7 @@ What it does **not** do: monitor the server over time, review logs, test passwor
 ## What you'll need from the client
 
 - Network access to the server (office network or VPN)
-- FileMaker Server Admin Console credentials, and OttoFMS credentials if it's installed
+- FileMaker Server Admin Console credentials, which OttoFMS also accepts
 - Remote desktop access to the server (RDP for Windows, Screen Sharing for Mac), ideally as an administrator
 - A Full Access login for each file, or someone at the client to export the XML for you
 
@@ -77,4 +77,6 @@ This tool produces a point-in-time review against the checks listed. It is not c
 
 ## License
 
-To be decided.
+MIT, the same as RCC's [rcc-fm](https://github.com/FMTrainingTV-AI/rcc-fm) plugin. See [LICENSE](LICENSE).
+
+The reference skills in `.claude/skills/*-reference` are copied from rcc-fm.

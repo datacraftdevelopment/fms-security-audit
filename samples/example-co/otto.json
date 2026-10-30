@@ -1,0 +1,13 @@
+{
+  "host": "fms.example.com",
+  "collected_at": "2026-10-30T15:20:00+00:00",
+  "installed": true,
+  "version": "4.18.2",
+  "fms_version": "22.0.4.400",
+  "license_valid": true,
+  "api_keys": [
+    {"label": "Web form", "database": "Contacts", "createdAt": "2026-03-02", "lastUsed": "2026-10-29", "expiration": "2027-03-02"},
+    {"label": "Old integration", "database": "Invoices", "createdAt": "2024-05-11", "lastUsed": "2025-01-20", "expiration": null}
+  ],
+  "settings_readable": true
+}

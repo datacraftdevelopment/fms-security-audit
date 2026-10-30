@@ -63,7 +63,7 @@ def test_parser_reads_sample(audit_dir):
 
 def test_sample_findings_are_stable(audit_dir):
     out = engine.run(audit_dir)
-    assert out["counts"] == {"fail": 10, "warn": 10, "pass": 24, "nc": 1}
+    assert out["counts"] == {"fail": 10, "warn": 11, "pass": 24, "nc": 0}
     status = {(r["id"], r["scope"]): r["status"] for r in out["results"]}
     assert status[("SRV-01", "server")] == "fail"
     assert status[("OS-03", "os")] == "fail"
@@ -107,3 +107,30 @@ def test_published_sample_report_is_current(audit_dir, tmp_path):
     engine.run(audit_dir)
     fresh = report.build(audit_dir, out=tmp_path / "sample.html", sample=True).read_text()
     assert fresh == (ROOT / "docs" / "sample-report.html").read_text(), "Regenerate with: python scripts/build_sample.py"
+
+
+def test_otto_keeps_no_key_secrets():
+    from audit.collect import ottofms
+
+    raw = {
+        "info": {"ok": True, "data": {"Otto": {"version": "4.18.2", "isLicenseValid": True}, "FileMakerServer": {"version": {"long": "22.0.4"}}}},
+        "api_keys": {"ok": True, "data": {"api-keys": [{"label": "k", "key": "SECRET", "expiration": None}]}},
+        "settings": {"ok": False},
+    }
+    out = ottofms.normalize(raw, "h")
+    assert "SECRET" not in str(out)
+    assert out["version"] == "4.18.2" and out["api_keys"][0]["label"] == "k"
+
+
+def test_otto_html_catch_all_is_not_an_answer():
+    from audit.collect import ottofms
+
+    class Resp:
+        status_code = 200
+        headers = {"Content-Type": "text/html"}
+
+    class S:
+        def get(self, url):
+            return Resp()
+
+    assert ottofms._fetch(S(), "https://h", "/otto/api/nope")["ok"] is False
