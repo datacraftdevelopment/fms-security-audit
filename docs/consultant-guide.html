@@ -243,7 +243,7 @@ sha256: 9f2c...e41a
   <li>Use Save a Copy as XML with only the accounts and security information selected.</li>
   <li>Name it after the file, for example <code>Invoices.xml</code>, and save it to <code>audits/&lt;client&gt;/&lt;date&gt;/xml/</code>.</li>
 </ol>
-<p>Passwords are never in the export. The agent deletes the XML once it has been read; the parsed accounts list stays in <code>files.json</code> for the report.</p>
+<p>Plain passwords are never in the export, but it can contain encrypted password hashes, so treat the XML files as sensitive. The parser skips the hashes and deletes the XML once it has been read; only the parsed accounts list stays, in <code>files.json</code>, for the report.</p>
 <div class="note">The exact menu options are confirmed against the client's FileMaker Pro version when the file-audit skill is built. The skill prints current instructions every time.</div>
 </section>
 

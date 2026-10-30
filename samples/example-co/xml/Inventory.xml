@@ -1,81 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Fictitious sample for tests. Element names approximate FileMaker's Save as XML output. -->
-<FMSaveAsXML version="2.2.3.0" Source="22.0" File="Inventory.fmp12">
-  <Structure>
-    <AddAction>
+<!-- Fictitious sample. Structure follows a real FileMaker 26 Save as XML export (see tests/fixtures/saxml-fm26-accounts.xml). -->
+<FMSaveAsXML version="2.3.0.0" Source="26.0.1" File="Inventory.fmp12" locale="English" split_catalogs="False">
+  <Structure membercount="1">
+    <AddAction membercount="3">
       <PrivilegeSetsCatalog>
-      <PrivilegeSet id="684" name="[Full Access]" comment="">
-        <Records value="create, edit and delete in all tables"/>
-        <Layouts value="all modifiable"/>
-        <ValueLists value="all modifiable"/>
-        <Scripts value="all modifiable"/>
-        <Exporting value="True"/>
-        <Printing value="True"/>
-        <ManageAccounts value="True"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="542" name="[Read-Only Access]" comment="">
-        <Records value="view only"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="746" name="Warehouse" comment="">
-        <Records value="create, edit and delete in all tables"/>
-        <Layouts value="view only"/>
-        <ValueLists value="all modifiable"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="297" name="Office" comment="">
-        <Records value="create and edit in all tables"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
+        <ObjectList>
+          <PrivilegeSet id="684" name="[Full Access]">
+            <Description></Description>
+            <access default="True">
+              <Records Create="True" Edit="True" Delete="True"/>
+              <Layouts Create="True" Edit="True" Delete="True"/>
+              <ValueLists Create="True" Edit="True" Delete="True"/>
+              <Scripts Create="True" Edit="True" Delete="True"/>
+              <Other Print="True" Export="True" manageAccounts="True" manageExtPrivs="True"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="542" name="[Read-Only Access]">
+            <Description></Description>
+            <access default="True">
+              <Records View="ReadOnly"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="746" name="Warehouse">
+            <Description></Description>
+            <access default="False">
+              <Records Create="True" Edit="True" Delete="True"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists Create="True" Edit="True" Delete="True"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="297" name="Office">
+            <Description></Description>
+            <access default="False">
+              <Records Create="True" Edit="True" Delete="False"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+        </ObjectList>
       </PrivilegeSetsCatalog>
       <ExtendedPrivilegesCatalog>
-      <ExtendedPrivilege id="67" name="fmapp">
-        <PrivilegeSetReference name="[Full Access]"/>
-        <PrivilegeSetReference name="Warehouse"/>
-        <PrivilegeSetReference name="Office"/>
-      </ExtendedPrivilege>
+        <ObjectList>
+          <ExtendedPrivilege id="67" name="fmapp">
+            <ObjectList membercount="3">
+              <PrivilegeSetReference name="[Full Access]"/>
+              <PrivilegeSetReference name="Warehouse"/>
+              <PrivilegeSetReference name="Office"/>
+            </ObjectList>
+          </ExtendedPrivilege>
+        </ObjectList>
       </ExtendedPrivilegesCatalog>
       <AccountsCatalog>
-      <Account id="184" name="[Guest]" status="Inactive" type="FileMaker">
-        <PrivilegeSetReference name="[Read-Only Access]"/>
-      </Account>
-      <Account id="710" name="rcc.dev" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="294" name="itlead" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="818" name="wh1" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Warehouse"/>
-      </Account>
-      <Account id="772" name="wh2" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Warehouse"/>
-      </Account>
-      <Account id="918" name="wh3" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Warehouse"/>
-      </Account>
-      <Account id="352" name="off1" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Office"/>
-      </Account>
-      <Account id="821" name="off2" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Office"/>
-      </Account>
-      <Account id="409" name="off3" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Office"/>
-      </Account>
+        <ObjectList>
+          <Account id="184" kind="0" type="FileMaker" enable="False">
+            <Authentication>
+              <AccountName>[Guest]</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Read-Only Access]"/>
+          </Account>
+          <Account id="710" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>rcc.dev</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="294" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>itlead</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="818" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>wh1</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Warehouse"/>
+          </Account>
+          <Account id="772" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>wh2</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Warehouse"/>
+          </Account>
+          <Account id="918" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>wh3</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Warehouse"/>
+          </Account>
+          <Account id="352" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>off1</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Office"/>
+          </Account>
+          <Account id="821" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>off2</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Office"/>
+          </Account>
+          <Account id="409" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>off3</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Office"/>
+          </Account>
+        </ObjectList>
       </AccountsCatalog>
     </AddAction>
   </Structure>

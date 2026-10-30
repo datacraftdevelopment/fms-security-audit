@@ -1,112 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Fictitious sample for tests. Element names approximate FileMaker's Save as XML output. -->
-<FMSaveAsXML version="2.2.3.0" Source="22.0" File="Invoices.fmp12">
-  <Structure>
-    <AddAction>
+<!-- Fictitious sample. Structure follows a real FileMaker 26 Save as XML export (see tests/fixtures/saxml-fm26-accounts.xml). -->
+<FMSaveAsXML version="2.3.0.0" Source="26.0.1" File="Invoices.fmp12" locale="English" split_catalogs="False">
+  <Structure membercount="1">
+    <AddAction membercount="3">
       <PrivilegeSetsCatalog>
-      <PrivilegeSet id="684" name="[Full Access]" comment="">
-        <Records value="create, edit and delete in all tables"/>
-        <Layouts value="all modifiable"/>
-        <ValueLists value="all modifiable"/>
-        <Scripts value="all modifiable"/>
-        <Exporting value="True"/>
-        <Printing value="True"/>
-        <ManageAccounts value="True"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="542" name="[Read-Only Access]" comment="">
-        <Records value="view only"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="367" name="Staff" comment="">
-        <Records value="create and edit in all tables"/>
-        <Layouts value="all modifiable"/>
-        <ValueLists value="all modifiable"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="736" name="Web Form" comment="">
-        <Records value="create only in Invoices"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="644" name="Read Only" comment="">
-        <Records value="view only"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="False"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
+        <ObjectList>
+          <PrivilegeSet id="684" name="[Full Access]">
+            <Description></Description>
+            <access default="True">
+              <Records Create="True" Edit="True" Delete="True"/>
+              <Layouts Create="True" Edit="True" Delete="True"/>
+              <ValueLists Create="True" Edit="True" Delete="True"/>
+              <Scripts Create="True" Edit="True" Delete="True"/>
+              <Other Print="True" Export="True" manageAccounts="True" manageExtPrivs="True"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="542" name="[Read-Only Access]">
+            <Description></Description>
+            <access default="True">
+              <Records View="ReadOnly"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="367" name="Staff">
+            <Description></Description>
+            <access default="False">
+              <Records Create="True" Edit="True" Delete="False"/>
+              <Layouts Create="True" Edit="True" Delete="True"/>
+              <ValueLists Create="True" Edit="True" Delete="True"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="736" name="Web Form">
+            <Description></Description>
+            <access default="False">
+              <Records Create="True" Edit="False" Delete="False"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="644" name="Read Only">
+            <Description></Description>
+            <access default="False">
+              <Records View="ReadOnly"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="False" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+        </ObjectList>
       </PrivilegeSetsCatalog>
       <ExtendedPrivilegesCatalog>
-      <ExtendedPrivilege id="67" name="fmapp">
-        <PrivilegeSetReference name="[Full Access]"/>
-        <PrivilegeSetReference name="Staff"/>
-        <PrivilegeSetReference name="Read Only"/>
-      </ExtendedPrivilege>
-      <ExtendedPrivilege id="68" name="fmrest">
-        <PrivilegeSetReference name="Staff"/>
-        <PrivilegeSetReference name="Web Form"/>
-      </ExtendedPrivilege>
+        <ObjectList>
+          <ExtendedPrivilege id="67" name="fmapp">
+            <ObjectList membercount="3">
+              <PrivilegeSetReference name="[Full Access]"/>
+              <PrivilegeSetReference name="Staff"/>
+              <PrivilegeSetReference name="Read Only"/>
+            </ObjectList>
+          </ExtendedPrivilege>
+          <ExtendedPrivilege id="68" name="fmrest">
+            <ObjectList membercount="2">
+              <PrivilegeSetReference name="Staff"/>
+              <PrivilegeSetReference name="Web Form"/>
+            </ObjectList>
+          </ExtendedPrivilege>
+        </ObjectList>
       </ExtendedPrivilegesCatalog>
       <AccountsCatalog>
-      <Account id="184" name="[Guest]" status="Inactive" type="FileMaker">
-        <PrivilegeSetReference name="[Read-Only Access]"/>
-      </Account>
-      <Account id="820" name="Admin" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="710" name="rcc.dev" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="294" name="itlead" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="909" name="jsmith" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="100" name="mlopez" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="123" name="frontdesk" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="592" name="akim" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="323" name="bwong" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="574" name="cdavis" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="820" name="dpatel" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Staff"/>
-      </Account>
-      <Account id="797" name="eortiz" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Staff"/>
-      </Account>
-      <Account id="249" name="fchen" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Staff"/>
-      </Account>
-      <Account id="178" name="webform" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Web Form"/>
-      </Account>
-      <Account id="980" name="auditor" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Read Only"/>
-      </Account>
+        <ObjectList>
+          <Account id="184" kind="0" type="FileMaker" enable="False">
+            <Authentication>
+              <AccountName>[Guest]</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Read-Only Access]"/>
+          </Account>
+          <Account id="820" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>Admin</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="710" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>rcc.dev</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="294" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>itlead</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="909" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>jsmith</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="100" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>mlopez</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="123" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>frontdesk</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="592" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>akim</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="323" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>bwong</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="574" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>cdavis</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="820" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>dpatel</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Staff"/>
+          </Account>
+          <Account id="797" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>eortiz</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Staff"/>
+          </Account>
+          <Account id="249" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>fchen</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Staff"/>
+          </Account>
+          <Account id="178" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>webform</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Web Form"/>
+          </Account>
+          <Account id="980" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>auditor</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Read Only"/>
+          </Account>
+        </ObjectList>
       </AccountsCatalog>
     </AddAction>
   </Structure>

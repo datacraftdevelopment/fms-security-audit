@@ -134,3 +134,16 @@ def test_otto_html_catch_all_is_not_an_answer():
             return Resp()
 
     assert ottofms._fetch(S(), "https://h", "/otto/api/nope")["ok"] is False
+
+
+def test_real_fm26_export():
+    from audit.parse import fm_xml
+
+    out = fm_xml.parse_file(Path(__file__).parent / "fixtures" / "saxml-fm26-accounts.xml")
+    accounts = {a["name"]: a for a in out["accounts"]}
+    assert accounts["Admin"] == {"name": "Admin", "privilege_set": "[Full Access]", "active": True, "type": "FileMaker"}
+    assert accounts["[Guest]"]["active"] is False and out["guest_enabled"] is False
+    sets = {s["name"]: s for s in out["privilege_sets"]}
+    assert sets["[Data Entry Only]"]["broad_delete"] is True and sets["[Data Entry Only]"]["layouts_modify"] is False
+    assert sets["[Full Access]"]["manage_accounts"] is True
+    assert "PasswordEncrypted" not in str(out) and "REDACTED" not in str(out)

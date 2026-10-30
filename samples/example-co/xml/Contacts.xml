@@ -1,66 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Fictitious sample for tests. Element names approximate FileMaker's Save as XML output. -->
-<FMSaveAsXML version="2.2.3.0" Source="22.0" File="Contacts.fmp12">
-  <Structure>
-    <AddAction>
+<!-- Fictitious sample. Structure follows a real FileMaker 26 Save as XML export (see tests/fixtures/saxml-fm26-accounts.xml). -->
+<FMSaveAsXML version="2.3.0.0" Source="26.0.1" File="Contacts.fmp12" locale="English" split_catalogs="False">
+  <Structure membercount="1">
+    <AddAction membercount="3">
       <PrivilegeSetsCatalog>
-      <PrivilegeSet id="684" name="[Full Access]" comment="">
-        <Records value="create, edit and delete in all tables"/>
-        <Layouts value="all modifiable"/>
-        <ValueLists value="all modifiable"/>
-        <Scripts value="all modifiable"/>
-        <Exporting value="True"/>
-        <Printing value="True"/>
-        <ManageAccounts value="True"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="542" name="[Read-Only Access]" comment="">
-        <Records value="view only"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
-      <PrivilegeSet id="367" name="Staff" comment="">
-        <Records value="create and edit in all tables"/>
-        <Layouts value="view only"/>
-        <ValueLists value="view only"/>
-        <Scripts value="executable only"/>
-        <Exporting value="False"/>
-        <Printing value="True"/>
-        <ManageAccounts value="False"/>
-      </PrivilegeSet>
+        <ObjectList>
+          <PrivilegeSet id="684" name="[Full Access]">
+            <Description></Description>
+            <access default="True">
+              <Records Create="True" Edit="True" Delete="True"/>
+              <Layouts Create="True" Edit="True" Delete="True"/>
+              <ValueLists Create="True" Edit="True" Delete="True"/>
+              <Scripts Create="True" Edit="True" Delete="True"/>
+              <Other Print="True" Export="True" manageAccounts="True" manageExtPrivs="True"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="542" name="[Read-Only Access]">
+            <Description></Description>
+            <access default="True">
+              <Records View="ReadOnly"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+          <PrivilegeSet id="367" name="Staff">
+            <Description></Description>
+            <access default="False">
+              <Records Create="True" Edit="True" Delete="False"/>
+              <Layouts View="ReadOnly"/>
+              <ValueLists View="ReadOnly"/>
+              <Scripts View="ReadOnly"/>
+              <Other Print="True" Export="False" manageAccounts="False" manageExtPrivs="False"/>
+            </access>
+          </PrivilegeSet>
+        </ObjectList>
       </PrivilegeSetsCatalog>
       <ExtendedPrivilegesCatalog>
-      <ExtendedPrivilege id="67" name="fmapp">
-        <PrivilegeSetReference name="[Full Access]"/>
-        <PrivilegeSetReference name="Staff"/>
-        <PrivilegeSetReference name="[Read-Only Access]"/>
-      </ExtendedPrivilege>
-      <ExtendedPrivilege id="98" name="fmodata">
-        <PrivilegeSetReference name="Staff"/>
-      </ExtendedPrivilege>
+        <ObjectList>
+          <ExtendedPrivilege id="67" name="fmapp">
+            <ObjectList membercount="3">
+              <PrivilegeSetReference name="[Full Access]"/>
+              <PrivilegeSetReference name="Staff"/>
+              <PrivilegeSetReference name="[Read-Only Access]"/>
+            </ObjectList>
+          </ExtendedPrivilege>
+          <ExtendedPrivilege id="98" name="fmodata">
+            <ObjectList membercount="1">
+              <PrivilegeSetReference name="Staff"/>
+            </ObjectList>
+          </ExtendedPrivilege>
+        </ObjectList>
       </ExtendedPrivilegesCatalog>
       <AccountsCatalog>
-      <Account id="184" name="[Guest]" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Read-Only Access]"/>
-      </Account>
-      <Account id="710" name="rcc.dev" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="294" name="itlead" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="[Full Access]"/>
-      </Account>
-      <Account id="559" name="mgreen" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Staff"/>
-      </Account>
-      <Account id="683" name="tnguyen" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Staff"/>
-      </Account>
-      <Account id="159" name="prao" status="Active" type="FileMaker">
-        <PrivilegeSetReference name="Staff"/>
-      </Account>
+        <ObjectList>
+          <Account id="184" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>[Guest]</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Read-Only Access]"/>
+          </Account>
+          <Account id="710" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>rcc.dev</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="294" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>itlead</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="[Full Access]"/>
+          </Account>
+          <Account id="559" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>mgreen</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Staff"/>
+          </Account>
+          <Account id="683" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>tnguyen</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Staff"/>
+          </Account>
+          <Account id="159" kind="0" type="FileMaker" enable="True">
+            <Authentication>
+              <AccountName>prao</AccountName>
+            </Authentication>
+            <PrivilegeSetReference name="Staff"/>
+          </Account>
+        </ObjectList>
       </AccountsCatalog>
     </AddAction>
   </Structure>

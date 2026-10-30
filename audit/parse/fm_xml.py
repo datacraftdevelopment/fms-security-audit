@@ -1,17 +1,26 @@
 """Read accounts, privilege sets and extended privileges from a FileMaker Save as XML export.
 
-The FMSaveAsXML format differs between FileMaker versions, so this parser does not
-depend on exact paths. It looks for Account, PrivilegeSet and ExtendedPrivilege
-elements anywhere in the document and reads the attributes and child elements it
-recognises. Anything it can't find is left as None, and the matching rule reports
-Not checked. Validate against a real export from each FileMaker version you support.
+Built against a real FileMaker 26 export (tests/fixtures/saxml-fm26-accounts.xml):
+
+    AccountsCatalog/ObjectList/Account[@enable, @type]
+        Authentication/AccountName            the account name (text)
+        Authentication/PasswordEncrypted      a password hash: never read or kept
+        PrivilegeSetReference[@name]
+    PrivilegeSetsCatalog/ObjectList/PrivilegeSet[@name]
+        access/Records[@Create @Edit @Delete | @View="ReadOnly"]
+        access/Layouts, ValueLists, Scripts   same attributes
+        access/Other[@Print @Export @manageAccounts]
+    ExtendedPrivilegesCatalog/ObjectList/ExtendedPrivilege[@name]
+        ObjectList/PrivilegeSetReference[@name]   the sets that have it
+
+Elements are found by name anywhere in the document, so a split-catalog export
+works too. A value the parser can't read is left as None, and the matching rule
+reports Not checked rather than guessing.
 """
 
 from pathlib import Path
 
 from lxml import etree
-
-TRUE = {"true", "yes", "1", "on", "enabled", "all", "modifiable", "allow"}
 
 
 def _local(tag):
@@ -22,64 +31,66 @@ def _find_all(root, name):
     return [el for el in root.iter() if _local(el.tag) == name]
 
 
-def _attr(el, *names):
-    lower = {k.lower(): v for k, v in el.attrib.items()}
-    for n in names:
-        if n.lower() in lower:
-            return lower[n.lower()]
-    return None
+def _first(el, name):
+    return next((c for c in el.iter() if c is not el and _local(c.tag) == name), None)
 
 
-def _flag(value):
-    if value is None:
+def _bool(value):
+    return None if value is None else str(value).strip().lower() == "true"
+
+
+def _modifies(el):
+    """True if the privilege set can edit this kind of object, False if view or none, None if custom."""
+    if el is None:
         return None
-    return str(value).strip().lower() in TRUE
-
-
-def _child(el, *names):
-    for child in el.iter():
-        if child is not el and _local(child.tag) in names:
-            return child
+    if el.get("Edit") is not None:
+        return _bool(el.get("Edit"))
+    if el.get("View") is not None:
+        return False
     return None
-
-
-def _set_ref(el):
-    ref = _child(el, "PrivilegeSetReference", "PrivilegeSet")
-    if ref is not None:
-        return _attr(ref, "name")
-    return _attr(el, "privilegeSet", "privilegeSetName")
-
-
-def _modifies(value):
-    if value is None:
-        return None
-    v = str(value).strip().lower()
-    return "modif" in v or v in ("all", "true", "yes", "1")
 
 
 def _privilege_set(el):
-    def opt(*names):
-        for n in names:
-            v = _attr(el, n)
-            if v is not None:
-                return v
-            child = _child(el, n)
-            if child is not None:
-                return _attr(child, "value", "access") or (child.text or "").strip() or None
-        return None
-
-    records = opt("records", "Records")
+    access = _first(el, "access")
+    part = lambda name: _first(access, name) if access is not None else None  # noqa: E731
+    records, other = part("Records"), part("Other")
+    if records is None:
+        rec_text, delete = None, None
+    elif records.get("Delete") is not None:
+        delete = _bool(records.get("Delete"))
+        verbs = [v.lower() for v in ("Create", "Edit", "Delete") if _bool(records.get(v))]
+        rec_text = (", ".join(verbs) + " in all tables") if verbs else "no access"
+    elif records.get("View") is not None:
+        rec_text, delete = "view only", False
+    else:
+        rec_text, delete = "custom", None
+    flag = lambda name: _bool(other.get(name)) if other is not None else None  # noqa: E731
     return {
-        "name": _attr(el, "name"),
-        "records": records,
-        "broad_delete": None if records is None else "delete" in records.lower() or records.lower() == "all",
-        "layouts_modify": _modifies(opt("layouts", "Layouts")),
-        "scripts_modify": _modifies(opt("scripts", "Scripts")),
-        "value_lists_modify": _modifies(opt("valueLists", "ValueLists")),
-        "manage_accounts": _flag(opt("manageAccounts", "ManageAccounts")),
-        "export": _flag(opt("allowExporting", "exporting", "Exporting")),
-        "print": _flag(opt("allowPrinting", "printing", "Printing")),
+        "name": el.get("name"),
+        "records": rec_text,
+        "broad_delete": delete,
+        "layouts_modify": _modifies(part("Layouts")),
+        "scripts_modify": _modifies(part("Scripts")),
+        "value_lists_modify": _modifies(part("ValueLists")),
+        "manage_accounts": flag("manageAccounts"),
+        "export": flag("Export"),
+        "print": flag("Print"),
         "ext_privs": [],
+    }
+
+
+def _account(el):
+    name_el = _first(el, "AccountName")
+    name = (name_el.text or "").strip() if name_el is not None else el.get("name")
+    if not name:
+        return None
+    ref = _first(el, "PrivilegeSetReference")
+    enable = el.get("enable")
+    return {
+        "name": name,
+        "privilege_set": ref.get("name") if ref is not None else None,
+        "active": True if enable is None else _bool(enable),
+        "type": el.get("type") or "FileMaker",
     }
 
 
@@ -89,39 +100,23 @@ def parse_file(path):
 
     sets = {}
     for el in _find_all(root, "PrivilegeSet"):
-        if _attr(el, "name") and (len(el) or len(el.attrib) > 2):
-            ps = _privilege_set(el)
-            sets.setdefault(ps["name"], ps)
+        if el.get("name") and _first(el, "access") is not None:
+            sets.setdefault(el.get("name"), _privilege_set(el))
 
     for el in _find_all(root, "ExtendedPrivilege"):
-        keyword = _attr(el, "name", "keyword")
+        keyword = el.get("name")
         if not keyword:
             continue
-        for ref in el.iter():
-            if _local(ref.tag) in ("PrivilegeSetReference", "PrivilegeSet") and ref is not el:
-                name = _attr(ref, "name")
-                if name in sets:
-                    sets[name]["ext_privs"].append(keyword)
-                elif name:
-                    sets[name] = {"name": name, "ext_privs": [keyword]}
+        for ref in _find_all(el, "PrivilegeSetReference"):
+            name = ref.get("name")
+            if name in sets:
+                sets[name]["ext_privs"].append(keyword)
 
-    accounts = []
-    for el in _find_all(root, "Account"):
-        name = _attr(el, "name")
-        if not name:
-            continue
-        status = _attr(el, "status", "active", "enabled")
-        accounts.append(
-            {
-                "name": name,
-                "privilege_set": _set_ref(el),
-                "active": True if status is None else _flag(status) or str(status).lower() == "active",
-                "type": _attr(el, "type", "authenticationType") or "FileMaker",
-            }
-        )
+    accounts = [a for a in map(_account, _find_all(root, "Account")) if a]
 
+    file_name = root.get("File") or Path(path).stem + ".fmp12"
     return {
-        "name": Path(path).stem + ".fmp12",
+        "name": file_name,
         "accounts": accounts,
         "privilege_sets": list(sets.values()),
         "guest_enabled": next((a["active"] for a in accounts if a["name"].strip("[]").lower() == "guest"), None),
