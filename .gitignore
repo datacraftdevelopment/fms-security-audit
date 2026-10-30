@@ -1,0 +1,28 @@
+# Client work: never commit
+audits/*
+!audits/README.md
+!audits/_template/
+!audits/_template/**
+
+# Secrets
+.env
+*.env
+*.key
+*.pem
+
+# Exports and reports anywhere outside samples
+*.xml
+!samples/**/*.xml
+*.pdf
+!samples/**/*.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

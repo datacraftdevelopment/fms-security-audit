@@ -1,0 +1,1 @@
+Read-only OS scripts (planned): os-audit-win.ps1 and os-audit-mac.sh. Each is self-contained, pasted into a terminal in a remote desktop session, writes nothing to disk, and prints a BEGIN/END result block.

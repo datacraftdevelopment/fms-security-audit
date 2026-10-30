@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FMS Security Audit: Consultant Guide</title>
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --ink: #1d1d1b; --muted: #5f5e5a; --line: #e4e1da;
+  --accent: #1f5f8b; --accent-soft: #e7f0f7; --warn: #8a5a00; --warn-soft: #fbf1dc;
+  --bad: #9b2c2c; --bad-soft: #fbe9e9; --good: #2f6b3a; --good-soft: #e5f2e7;
+  --code-bg: #f2f0eb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --surface: #1f1f1d; --ink: #ecebe7; --muted: #a8a69f; --line: #34332f;
+    --accent: #7db4dc; --accent-soft: #1c2c38; --warn: #e2b866; --warn-soft: #33291a;
+    --bad: #e79a9a; --bad-soft: #3a2222; --good: #8fc79a; --good-soft: #1f3123; --code-bg: #2a2a27;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 48px 16px 80px; }
+header.hero { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 32px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1 { font-size: 34px; line-height: 1.2; margin: 8px 0 12px; }
+h2 { font-size: 23px; margin: 48px 0 12px; padding-top: 8px; }
+h3 { font-size: 18px; margin: 28px 0 8px; }
+p.lead { font-size: 18px; color: var(--muted); margin: 0; }
+.meta { font-size: 14px; color: var(--muted); margin-top: 14px; }
+nav.toc { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin: 0 0 8px; }
+nav.toc ol { margin: 6px 0 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+nav.toc a { color: var(--ink); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+pre code { background: none; padding: 0; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.card h4 { margin: 0 0 6px; font-size: 15px; }
+.card p { margin: 0; font-size: 14px; color: var(--muted); }
+.steps { list-style: none; padding: 0; margin: 16px 0; counter-reset: step; }
+.steps > li { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px 14px 64px; margin-bottom: 14px; counter-increment: step; }
+.steps > li::before { content: counter(step); position: absolute; left: 18px; top: 16px; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--surface); font-weight: 700; display: grid; place-items: center; font-size: 15px; }
+.steps h3 { margin: 0 0 6px; }
+.steps p { margin: 6px 0; }
+.who { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); margin-left: 6px; vertical-align: 2px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+.split > div { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--bg); }
+.split h4 { margin: 0 0 6px; font-size: 15px; }
+.split ol { margin: 0; padding-left: 20px; font-size: 15px; }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 15px; }
+.note.warn { border-color: var(--warn); background: var(--warn-soft); }
+.note.bad { border-color: var(--bad); background: var(--bad-soft); }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+.rules { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.rules ul { margin: 6px 0 0; padding-left: 20px; }
+.do h4 { color: var(--good); } .dont h4 { color: var(--bad); }
+.do, .dont { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+.do h4, .dont h4 { margin: 0; }
+ul.check { list-style: none; padding: 0; }
+ul.check li { padding-left: 28px; position: relative; margin: 6px 0; }
+ul.check li::before { content: ""; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border: 1.5px solid var(--muted); border-radius: 4px; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+@media (max-width: 680px) {
+  .cards, .split, .rules { grid-template-columns: 1fr; }
+  nav.toc ol { columns: 1; }
+  h1 { font-size: 28px; }
+  .steps > li { padding-left: 56px; }
+  table { display: block; overflow-x: auto; }
+}
+@media print { body { background: #fff; } .wrap { padding-top: 0; } .steps > li, .card { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Consultant guide</div>
+  <h1>FileMaker Security Audit</h1>
+  <p class="lead">What the audit is, what you need before you start, and every step from opening the repo to handing the client their report.</p>
+  <div class="meta">Draft v0.1 &middot; October 2026 &middot; Command names are the planned ones and may change as the repo is built.</div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#what">What we do</a></li>
+    <li><a href="#rules">Ground rules</a></li>
+    <li><a href="#need">What you need</a></li>
+    <li><a href="#steps">Running an audit</a></li>
+    <li><a href="#os">The OS script in detail</a></li>
+    <li><a href="#xml">Exporting the accounts XML</a></li>
+    <li><a href="#trouble">When something goes wrong</a></li>
+    <li><a href="#close">Close-out checklist</a></li>
+  </ol>
+</nav>
+
+<section id="what">
+<h2>What we do</h2>
+<p>We give the client a dated, best-practice review of their FileMaker Server and the files it hosts. The audit catches the drift we see a year after handoff: privileges opened up to get something built, and everyone working on full-access accounts. The client gets a report that says what passes, what doesn't, and how to fix it. Fixing it is their call and their work, unless they hire us to help.</p>
+<div class="cards">
+  <div class="card"><h4>Server checklist</h4><p>FileMaker Server settings through the Admin API and OttoFMS: version, certificate, encryption, web publishing, backups, schedules.</p></div>
+  <div class="card"><h4>OS checklist</h4><p>Listening ports, firewall, OS version and patching, local admins, disk encryption and antivirus, from one pasted script.</p></div>
+  <div class="card"><h4>File audits</h4><p>Accounts, privilege sets and extended privileges for each hosted file, from an accounts-only XML export.</p></div>
+</div>
+<p>What it is <strong>not</strong>: ongoing monitoring, log review, password testing, or any testing from outside the client's network. The report says so in plain words.</p>
+</section>
+
+<section id="rules">
+<h2>Ground rules</h2>
+<div class="rules">
+  <div class="do">
+    <h4>Always</h4>
+    <ul>
+      <li>Type passwords only at the local login prompt in your own terminal.</li>
+      <li>Keep client data inside <code>audits/</code>, which git ignores.</li>
+      <li>Run the OS script as given, read-only, inside your normal remote desktop session.</li>
+      <li>Let the rules decide pass or fail; edit only the summary paragraph.</li>
+    </ul>
+  </div>
+  <div class="dont">
+    <h4>Never</h4>
+    <ul>
+      <li>Paste a password into Claude or Codex. If one ends up there, stop and tell the client to change it.</li>
+      <li>Install anything on the client's server, or change a setting during the audit.</li>
+      <li>Scan or probe the server from outside. That is a separate service with its own authorization.</li>
+      <li>Commit anything from <code>audits/</code>, or turn off the secret-scan hook.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="need">
+<h2>What you need</h2>
+<table>
+  <thead><tr><th>Item</th><th>From</th><th>Used for</th></tr></thead>
+  <tbody>
+    <tr><td>Network reach to the server (office network or VPN)</td><td>Client</td><td>Admin API and OttoFMS over HTTPS</td></tr>
+    <tr><td>FMS Admin Console username and password</td><td>Client</td><td>Server checklist</td></tr>
+    <tr><td>OttoFMS admin login or a temporary API key, if OttoFMS is installed</td><td>Client</td><td>OttoFMS checks</td></tr>
+    <tr><td>Remote desktop access: RDP for Windows, Screen Sharing or similar for Mac, ideally as an administrator</td><td>Client</td><td>OS checklist</td></tr>
+    <tr><td>A Full Access login per file, or the client's admin to export the XML</td><td>Client</td><td>File audits</td></tr>
+    <tr><td>Signed engagement letter, including the AI-processing line</td><td>RCC</td><td>Before any access</td></tr>
+    <tr><td>The repo, Python 3, and Claude Code or Codex on your laptop</td><td>RCC</td><td>Everything</td></tr>
+  </tbody>
+</table>
+</section>
+
+<section id="steps">
+<h2>Running an audit</h2>
+<p>Plan on about an hour per server once you have access. Everything runs from your own Mac or Windows laptop.</p>
+<ol class="steps">
+  <li>
+    <h3>Open the repo and start the audit <span class="who">You + agent</span></h3>
+    <p>Pull the latest version, open the repo in Claude Code or Codex, and ask:</p>
+    <pre><code>Run fms-audit for Example Co, server fms.example.com</code></pre>
+    <p>The agent creates <code>audits/example-co/2026-10-30/</code> and asks a few questions it records for the rules: which accounts belong to developers, and which privilege sets genuinely need the Data API, OData or WebDirect.</p>
+  </li>
+  <li>
+    <h3>Log in at the local prompt <span class="who">You</span></h3>
+    <p>In a separate terminal window, not the agent chat:</p>
+    <pre><code>python -m audit.login fms.example.com</code></pre>
+    <p>Type the Admin Console password, and the OttoFMS credentials if asked. They go into your computer's keychain. The agent never sees them.</p>
+  </li>
+  <li>
+    <h3>Collect server settings <span class="who">Agent</span></h3>
+    <p>The agent runs the server and OttoFMS checks over HTTPS. Nothing to do on the server. If OttoFMS isn't installed, those checks are marked Not checked and the run carries on.</p>
+  </li>
+  <li>
+    <h3>Run the OS script in your remote desktop session <span class="who">You</span></h3>
+    <p>The agent copies the right script to your clipboard. Paste it into a terminal on the server, then copy the result back. Details in <a href="#os">The OS script in detail</a>.</p>
+  </li>
+  <li>
+    <h3>Add the accounts XML for each file <span class="who">You or client</span></h3>
+    <p>Export an accounts-only XML for each hosted file and drop it in the engagement folder. See <a href="#xml">Exporting the accounts XML</a>. If the client does this, the agent prints instructions you can send them.</p>
+  </li>
+  <li>
+    <h3>Build and review the report <span class="who">Agent, then you</span></h3>
+    <p>The agent runs the rules and builds <code>report.html</code> and <code>report.pdf</code>. Read the whole thing. You may edit the executive summary; if a finding looks wrong, fix the input or the rule, not the report.</p>
+  </li>
+  <li>
+    <h3>Close out <span class="who">You</span></h3>
+    <pre><code>python -m audit.logout fms.example.com</code></pre>
+    <p>Deliver the PDF, copy the engagement folder to RCC's client storage, and work through the <a href="#close">close-out checklist</a>.</p>
+  </li>
+</ol>
+</section>
+
+<section id="os">
+<h2>The OS script in detail</h2>
+<p>One self-contained script, pasted into a terminal in the remote desktop session you already have. It only reads. It writes nothing to the server's disk and installs nothing. No SSH, WinRM or file transfer is needed.</p>
+<div class="split">
+  <div>
+    <h4>Windows server (RDP)</h4>
+    <ol>
+      <li>On your laptop: <code>python -m audit.os-script win</code></li>
+      <li>In the RDP session, right-click Start, open <strong>Terminal (Admin)</strong> or <strong>PowerShell</strong> with Run as administrator.</li>
+      <li>Paste and press Enter.</li>
+      <li>When it finishes, the result block is already on the clipboard.</li>
+    </ol>
+  </div>
+  <div>
+    <h4>Mac server (Screen Sharing)</h4>
+    <ol>
+      <li>On your laptop: <code>python -m audit.os-script mac</code></li>
+      <li>In the Screen Sharing session, open <strong>Terminal</strong>.</li>
+      <li>Paste and press Return. Enter the admin password once when sudo asks.</li>
+      <li>When it finishes, the result block is already on the clipboard.</li>
+    </ol>
+  </div>
+</div>
+<p>Back on your laptop:</p>
+<pre><code>python -m audit.os-import</code></pre>
+<p>This reads your clipboard, checks the block's checksum, and saves <code>os.json</code> in the engagement folder. The result looks like this:</p>
+<pre><code>----- FMS-AUDIT OS BEGIN v1 -----
+H4sIAAAAAAAAA+1YW2/bNhR+z68g9Lwl1t0O0IeiSLEB...
+sha256: 9f2c...e41a
+----- FMS-AUDIT OS END -----</code></pre>
+<div class="note">If the clipboard doesn't come across, select everything from BEGIN to END in the server window, copy it by hand, and run <code>os-import</code> again.</div>
+<h3>Without admin rights</h3>
+<p>The script still runs and marks what it couldn't read as Not checked, with the reason. That's acceptable, but say so in the summary.</p>
+<table>
+  <thead><tr><th>Needs admin</th><th>Windows</th><th>Mac</th></tr></thead>
+  <tbody>
+    <tr><td>No</td><td>OS version, patches, firewall profiles and rules, local admins, listening ports</td><td>OS version, updates, application firewall, admin group, FileVault status</td></tr>
+    <tr><td>Yes</td><td>BitLocker, Defender settings and exclusions, some process names</td><td>Process names behind all ports, pf rules</td></tr>
+  </tbody>
+</table>
+<div class="note warn">The only trace left on the server is the pasted text in that terminal's history. Close the window when you're done.</div>
+</section>
+
+<section id="xml">
+<h2>Exporting the accounts XML</h2>
+<p>For each file the server hosts:</p>
+<ol>
+  <li>Open the file from the server in FileMaker Pro on your laptop, signed in with a Full Access account.</li>
+  <li>Use Save a Copy as XML with only the accounts and security information selected.</li>
+  <li>Name it after the file, for example <code>Invoices.xml</code>, and save it to <code>audits/&lt;client&gt;/&lt;date&gt;/xml/</code>.</li>
+</ol>
+<p>Passwords are never in the export. The agent deletes the XML once it has been read; the parsed accounts list stays in <code>files.json</code> for the report.</p>
+<div class="note">The exact menu options are confirmed against the client's FileMaker Pro version when the file-audit skill is built. The skill prints current instructions every time.</div>
+</section>
+
+<section id="trouble">
+<h2>When something goes wrong</h2>
+<table>
+  <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Admin API login fails</td><td>Check you can open the Admin Console in a browser from your laptop. If not, it's a network or VPN issue. Re-run <code>audit.login</code> if the password was mistyped.</td></tr>
+    <tr><td>Certificate warning on connect</td><td>Don't bypass it silently. The agent records it as a finding; continue only with the client's OK.</td></tr>
+    <tr><td>Clipboard doesn't sync over RDP</td><td>Check clipboard redirection is on in your RDP client, or copy the block by hand.</td></tr>
+    <tr><td>Checksum fails on import</td><td>The block was cut off. Copy again from BEGIN to END.</td></tr>
+    <tr><td>Client won't share a Full Access login</td><td>Send them the export instructions the agent prints.</td></tr>
+    <tr><td>A finding looks wrong</td><td>Check the answers recorded in step 1. If the rule itself is wrong, raise it in the repo; don't edit the report by hand.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<section id="close">
+<h2>Close-out checklist</h2>
+<ul class="check">
+  <li>Report reviewed end to end, summary written</li>
+  <li>PDF delivered to the client's named contact</li>
+  <li><code>audit.logout</code> run; nothing stored in your keychain for this client</li>
+  <li>Client asked to rotate the Admin Console password and revoke any temporary OttoFMS key</li>
+  <li>Engagement folder copied to RCC client storage</li>
+  <li>Local engagement folder deleted after 90 days</li>
+  <li><code>git status</code> clean: nothing from the engagement staged</li>
+</ul>
+</section>
+
+<footer>RCC &middot; FileMaker Security Audit &middot; Consultant guide, draft v0.1. See the sample report in <code>docs/sample-report.html</code> for what the client receives.</footer>
+</div>
+</body>
+</html>

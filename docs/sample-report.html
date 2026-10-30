@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Security Audit Report</title>
+<style>
+:root {
+  --bg: #f6f5f2; --page: #ffffff; --ink: #1d1d1b; --muted: #5f5e5a; --line: #e4e1da; --head: #faf9f6;
+  --accent: #1f5f8b;
+  --pass: #2f6b3a; --pass-bg: #e5f2e7; --warn: #8a5a00; --warn-bg: #fbf1dc;
+  --fail: #9b2c2c; --fail-bg: #fbe9e9; --nc: #55534e; --nc-bg: #eceae5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --page: #1d1d1b; --ink: #ecebe7; --muted: #a8a69f; --line: #34332f; --head: #242422;
+    --accent: #7db4dc;
+    --pass: #8fc79a; --pass-bg: #1f3123; --warn: #e2b866; --warn-bg: #33291a;
+    --fail: #e79a9a; --fail-bg: #3a2222; --nc: #c4c2bb; --nc-bg: #2c2c29;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.page { max-width: 900px; margin: 32px auto; background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 48px 56px; }
+.sample { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); border-radius: 8px; padding: 8px 14px; font-size: 14px; margin-bottom: 28px; }
+.cover { border-bottom: 2px solid var(--ink); padding-bottom: 24px; margin-bottom: 8px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1 { font-size: 32px; line-height: 1.2; margin: 6px 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 17px; margin: 26px 0 8px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 24px; font-size: 14px; }
+.facts div span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.tally { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+.tally div { border-radius: 10px; padding: 12px 14px; }
+.tally b { display: block; font-size: 28px; line-height: 1.1; }
+.tally .f { background: var(--fail-bg); color: var(--fail); }
+.tally .w { background: var(--warn-bg); color: var(--warn); }
+.tally .p { background: var(--pass-bg); color: var(--pass); }
+.tally .n { background: var(--nc-bg); color: var(--nc); }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--head); }
+td.id { white-space: nowrap; color: var(--muted); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.s { display: inline-block; min-width: 86px; text-align: center; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.s.pass { background: var(--pass-bg); color: var(--pass); }
+.s.warn { background: var(--warn-bg); color: var(--warn); }
+.s.fail { background: var(--fail-bg); color: var(--fail); }
+.s.nc { background: var(--nc-bg); color: var(--nc); }
+.muted { color: var(--muted); }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.file-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.file-head .mini { font-size: 13px; color: var(--muted); }
+ol.fix > li { margin-bottom: 12px; }
+ol.fix b { font-weight: 700; }
+.disclaimer { break-inside: avoid; }
+blockquote { margin: 12px 0; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--head); font-size: 14px; }
+footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 720px) {
+  .page { margin: 0; border-radius: 0; border-left: 0; border-right: 0; padding: 28px 16px; }
+  .facts { grid-template-columns: 1fr 1fr; }
+  .tally { grid-template-columns: 1fr 1fr; }
+  .scroll { overflow-x: auto; }
+  h1 { font-size: 26px; }
+}
+@media print {
+  body { background: #fff; }
+  .page { border: 0; margin: 0; padding: 0; max-width: none; }
+  h2 { break-after: avoid; }
+  section.file, table { break-inside: avoid; }
+  .new-page { break-before: page; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<div class="sample"><strong>Sample report.</strong> Example Co, its server and every finding below are fictitious, made up to show what a client receives.</div>
+
+<section class="cover">
+  <div class="eyebrow">FileMaker Security Audit</div>
+  <h1>Example Co: FileMaker Server and Files</h1>
+  <div class="facts">
+    <div><span>Client</span>Example Co</div>
+    <div><span>Audit date</span>30 October 2026</div>
+    <div><span>Prepared by</span>RCC consultant</div>
+    <div><span>Server</span>fms.example.com</div>
+    <div><span>Platform</span>Windows Server 2019, FMS 22.0.2</div>
+    <div><span>Rule set</span>v1.0</div>
+  </div>
+</section>
+
+<section>
+<h2>Executive summary</h2>
+<p>Example Co's server is reachable, backed up nightly, and its main file is well structured, but security has drifted since setup. The most serious issues are an out-of-date FileMaker Server version, one file without encryption at rest, and the Invoices file, where 9 of 14 accounts have Full Access and the Data API is enabled for everyday staff. The Contacts file also allows Guest access. None of these needs downtime to fix except the server update.</p>
+<div class="tally" role="list" aria-label="Results across 45 checks">
+  <div class="f" role="listitem"><b>9</b>Fail</div>
+  <div class="w" role="listitem"><b>11</b>Warn</div>
+  <div class="p" role="listitem"><b>24</b>Pass</div>
+  <div class="n" role="listitem"><b>1</b>Not checked</div>
+</div>
+<p class="muted">45 checks: 9 server, 9 operating system, and 9 for each of 3 files.</p>
+</section>
+
+<section>
+<h2>Scope and method</h2>
+<p>We reviewed the configuration of one FileMaker Server and the three files it hosts as of 30 October 2026, against RCC's best-practice rule set v1.0. Server settings were read through the FileMaker Admin API. Operating system settings were read by a read-only script run in a remote desktop session. File security was read from an accounts-only XML export of each file. Nothing was installed or changed on the server.</p>
+<p><strong>Not covered:</strong> account passwords and password policy, ongoing monitoring, log review, and any testing from outside Example Co's network. Items marked Not checked could not be read and should not be read as passing.</p>
+</section>
+
+<section class="new-page">
+<h2>Server checklist</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td class="id">SRV-01</td><td>FileMaker Server version</td><td><span class="s fail">Fail</span></td><td>22.0.2 is below the minimum safe version, 22.0.4, which fixes a critical published vulnerability.</td></tr>
+    <tr><td class="id">SRV-02</td><td>SSL certificate</td><td><span class="s warn">Warn</span></td><td>Custom certificate, valid, but expires 20 November 2026 (21 days).</td></tr>
+    <tr><td class="id">SRV-03</td><td>Encryption at rest</td><td><span class="s fail">Fail</span></td><td>Contacts.fmp12 is not encrypted. Invoices and Inventory are.</td></tr>
+    <tr><td class="id">SRV-04</td><td>Host password-protected files only</td><td><span class="s pass">Pass</span></td><td>Enabled.</td></tr>
+    <tr><td class="id">SRV-05</td><td>Web technologies</td><td><span class="s fail">Fail</span></td><td>Data API and OData are on. Example Co uses the Data API for its web form; no use of OData was identified.</td></tr>
+    <tr><td class="id">SRV-06</td><td>Backup schedules</td><td><span class="s pass">Pass</span></td><td>Daily backup enabled, last run 30 October 2026 succeeded.</td></tr>
+    <tr><td class="id">SRV-07</td><td>Script schedules</td><td><span class="s warn">Warn</span></td><td>"Nightly import" runs as the Admin account, which has Full Access.</td></tr>
+    <tr><td class="id">SRV-08</td><td>Plug-ins</td><td><span class="s pass">Pass</span></td><td>2 plug-ins installed and listed in the appendix for review.</td></tr>
+    <tr><td class="id">SRV-09</td><td>OttoFMS</td><td><span class="s nc">Not checked</span></td><td>OttoFMS is not installed.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2>Operating system checklist</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td class="id">OS-01</td><td>Listening ports</td><td><span class="s warn">Warn</span></td><td>Port 8080 is open, owned by java.exe, and is not part of FileMaker Server.</td></tr>
+    <tr><td class="id">OS-02</td><td>Remote access services</td><td><span class="s warn">Warn</span></td><td>RDP (3389) and AnyDesk (7070) are listening. Confirm both are needed and limited to known users.</td></tr>
+    <tr><td class="id">OS-03</td><td>Firewall</td><td><span class="s fail">Fail</span></td><td>The Public firewall profile is turned off.</td></tr>
+    <tr><td class="id">OS-04</td><td>OS version</td><td><span class="s pass">Pass</span></td><td>Windows Server 2019, still supported.</td></tr>
+    <tr><td class="id">OS-05</td><td>Patching</td><td><span class="s warn">Warn</span></td><td>Last update installed 62 days ago.</td></tr>
+    <tr><td class="id">OS-06</td><td>Local administrators</td><td><span class="s warn">Warn</span></td><td>5 members, including a shared account named fmadmin.</td></tr>
+    <tr><td class="id">OS-07</td><td>Disk encryption</td><td><span class="s pass">Pass</span></td><td>BitLocker on for C: and D: (database and backups).</td></tr>
+    <tr><td class="id">OS-08</td><td>Antivirus</td><td><span class="s pass">Pass</span></td><td>Microsoft Defender running, signatures 1 day old.</td></tr>
+    <tr><td class="id">OS-09</td><td>Antivirus exclusions</td><td><span class="s warn">Warn</span></td><td>The live database folder is not excluded from real-time scanning, which Claris recommends.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section class="new-page">
+<h2>File audits</h2>
+
+<section class="file">
+<div class="file-head"><h3>Invoices.fmp12</h3><span class="mini">14 accounts &middot; 5 privilege sets &middot; 4 fail, 2 warn, 3 pass</span></div>
+<div class="scroll">
+<table>
+  <thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td class="id">FIL-01</td><td>Full Access accounts</td><td><span class="s fail">Fail</span></td><td>9 of 14 active accounts have Full Access, including 7 staff accounts.</td></tr>
+    <tr><td class="id">FIL-02</td><td>Default account names</td><td><span class="s fail">Fail</span></td><td>An active account named Admin.</td></tr>
+    <tr><td class="id">FIL-03</td><td>Guest account</td><td><span class="s pass">Pass</span></td><td>Disabled.</td></tr>
+    <tr><td class="id">FIL-04</td><td>Everyone on one privilege set</td><td><span class="s fail">Fail</span></td><td>64% of accounts share [Full Access].</td></tr>
+    <tr><td class="id">FIL-05</td><td>Wide privilege sets</td><td><span class="s warn">Warn</span></td><td>"Staff" can modify layouts and value lists.</td></tr>
+    <tr><td class="id">FIL-06</td><td>Export and print</td><td><span class="s pass">Pass</span></td><td>Matches what Example Co asked for.</td></tr>
+    <tr><td class="id">FIL-07</td><td>Extended privileges</td><td><span class="s fail">Fail</span></td><td>fmrest (Data API) is granted to "Staff" as well as the web form account.</td></tr>
+    <tr><td class="id">FIL-08</td><td>Shared logins</td><td><span class="s warn">Warn</span></td><td>"frontdesk" was connected from 3 machines at the time of the audit.</td></tr>
+    <tr><td class="id">FIL-09</td><td>External authentication</td><td><span class="s pass">Pass</span></td><td>No external accounts.</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="muted" style="margin-top:14px">Accounts with elevated access</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Account</th><th>Privilege set</th><th>Status</th><th>Type</th></tr></thead>
+  <tbody>
+    <tr><td>Admin</td><td>[Full Access]</td><td>Active</td><td>FileMaker</td></tr>
+    <tr><td>rcc.dev</td><td>[Full Access]</td><td>Active</td><td>FileMaker</td></tr>
+    <tr><td>jsmith</td><td>[Full Access]</td><td>Active</td><td>FileMaker</td></tr>
+    <tr><td>mlopez</td><td>[Full Access]</td><td>Active</td><td>FileMaker</td></tr>
+    <tr><td>frontdesk</td><td>[Full Access]</td><td>Active</td><td>FileMaker</td></tr>
+    <tr><td colspan="4" class="muted">4 more [Full Access] accounts and 5 on other sets are listed in the appendix.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section class="file">
+<div class="file-head"><h3>Contacts.fmp12</h3><span class="mini">6 accounts &middot; 3 privilege sets &middot; 1 fail, 1 warn, 7 pass</span></div>
+<div class="scroll">
+<table>
+  <thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td class="id">FIL-03</td><td>Guest account</td><td><span class="s fail">Fail</span></td><td>Guest is enabled with the "Read-Only Access" set, so anyone who can reach the server can open the file without a password.</td></tr>
+    <tr><td class="id">FIL-07</td><td>Extended privileges</td><td><span class="s warn">Warn</span></td><td>fmodata granted to "Staff"; no use identified.</td></tr>
+    <tr><td class="id">Other</td><td>FIL-01, 02, 04, 05, 06, 08, 09</td><td><span class="s pass">Pass</span></td><td>2 Full Access accounts, both RCC and the IT lead.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section class="file">
+<div class="file-head"><h3>Inventory.fmp12</h3><span class="mini">8 accounts &middot; 4 privilege sets &middot; 0 fail, 1 warn, 8 pass</span></div>
+<div class="scroll">
+<table>
+  <thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td class="id">FIL-05</td><td>Wide privilege sets</td><td><span class="s warn">Warn</span></td><td>"Warehouse" can delete records in all tables.</td></tr>
+    <tr><td class="id">Other</td><td>FIL-01 to 04, 06 to 09</td><td><span class="s pass">Pass</span></td><td>Closest to the original setup of the three files.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+</section>
+
+<section class="new-page">
+<h2>Remediation plan</h2>
+<p>Fails first, in the order we'd tackle them. Each is a change Example Co's administrator can make; RCC can help on request.</p>
+<ol class="fix">
+  <li><b>Update FileMaker Server to 22.0.4 or later (SRV-01).</b> Closes a critical published vulnerability. Needs a short maintenance window and a verified backup first.</li>
+  <li><b>Turn off Guest in Contacts (FIL-03).</b> Takes a minute and removes password-free access to customer data.</li>
+  <li><b>Turn the Public firewall profile back on (OS-03)</b>, with inbound rules only for 443 and 5003, plus RDP if needed from known addresses.</li>
+  <li><b>Move staff off Full Access in Invoices (FIL-01, FIL-04).</b> Create or tighten a "Staff" set and keep Full Access to two named administrators.</li>
+  <li><b>Rename or disable the Admin account in Invoices (FIL-02)</b>, and change the "Nightly import" schedule to run as a dedicated low-privilege account (SRV-07).</li>
+  <li><b>Remove fmrest from "Staff" in Invoices (FIL-07)</b> so only the web form account can use the Data API, and turn OData off on the server (SRV-05).</li>
+  <li><b>Encrypt Contacts at rest (SRV-03)</b> with the Developer Utility, then host the encrypted copy.</li>
+  <li><b>Warnings:</b> renew the certificate before 20 November, review port 8080 and AnyDesk, install pending Windows updates, replace the shared fmadmin account with named admins, add the database folder exclusion, and give each front-desk user their own login.</li>
+</ol>
+</section>
+
+<section>
+<h2>Appendix</h2>
+<p class="muted">In a real report this section lists the full accounts and privilege sets for each file, the raw server and OS settings that were read, the installed plug-ins, and the text of every rule in rule set v1.0. It is omitted from the sample.</p>
+</section>
+
+<section class="disclaimer">
+<h2>Disclaimer</h2>
+<blockquote>This report is a point-in-time review of Example Co's FileMaker Server and files as configured on 30 October 2026, against the checks listed in Scope and method. RCC has made a good-faith effort to find common security weaknesses and recommend improvements, but RCC does not manage, monitor or take responsibility for Example Co's servers, files or security. This review is not continuous monitoring and does not cover items marked Not checked, account passwords, or changes made after the audit date. A report with no failures does not guarantee a system is secure. Example Co remains responsible for its servers and files, and for deciding on and carrying out any remediation. RCC can help with remediation on request under a separate engagement.</blockquote>
+<p class="muted">Draft wording, pending legal review.</p>
+</section>
+
+<footer><span>Example Co &middot; FileMaker Security Audit &middot; 30 October 2026</span><span>Sample report, fictitious data</span></footer>
+</main>
+</body>
+</html>

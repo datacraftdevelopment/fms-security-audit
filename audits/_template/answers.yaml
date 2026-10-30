@@ -1,0 +1,10 @@
+# Answers the rules need. The agent fills this in with you at the start of the audit.
+client: ""
+server: ""
+platform: ""            # windows or mac
+ottofms_installed: null # true or false
+developer_accounts: []  # accounts that legitimately need Full Access
+data_api_sets: []       # privilege sets that genuinely need fmrest
+odata_sets: []          # privilege sets that genuinely need fmodata
+webdirect_sets: []      # privilege sets that genuinely need fmwebdirect
+export_denied_sets: []  # sets the client says should not export or print

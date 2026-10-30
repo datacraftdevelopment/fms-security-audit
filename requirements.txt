@@ -1,0 +1,6 @@
+# Planned dependencies; pinned when the audit package is built.
+requests
+keyring
+pyyaml
+lxml
+jinja2
