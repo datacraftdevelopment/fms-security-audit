@@ -8,7 +8,11 @@ A best-practice security audit for a FileMaker Server and the files it hosts. Yo
 
 Nothing is installed on the server and nothing on it is changed.
 
-**[Consultant guide](docs/consultant-guide.html)** · **[Sample report](docs/sample-report.html)** (fictitious client) · **[The checks in plain language](checklists/best-practices.md)**
+**[Consultant guide](docs/consultant-guide.pdf)** · **[Sample report](docs/sample-report.pdf)** (fictitious client) · **[The checks in plain language](checklists/best-practices.md)**
+
+[![First page of the sample report](docs/images/sample-report.png)](docs/sample-report.pdf)
+
+The guide and sample report are PDFs so GitHub can show them. The same documents are in `docs/` as HTML, which looks best when you open it from your own copy of the repo.
 
 The checks build on Claris's own guidance: **[Protecting FileMaker Server from automated attacks](https://support.claris.com/s/article/Protecting-FileMaker-Server-from-automated-attacks)**. Read it before your first audit; the report's recommendations line up with it.
 
@@ -219,7 +223,7 @@ The report runs in this order: cover, executive summary with the Pass/Warn/Fail 
 - **Warn:** review it. It is often fine with a reason, such as an extra Full Access account or a key that never expires.
 - **Not checked:** the data wasn't available. The finding says why.
 
-See [the sample report](docs/sample-report.html) for a full example.
+See [the sample report](docs/sample-report.pdf) for a full example.
 
 ## Re-audits and drift
 
@@ -281,7 +285,7 @@ fms-security-audit/
 - **Thresholds and remediation text** are in `rules/server.yaml`, `rules/os.yaml` and `rules/files.yaml`. For example, the minimum FileMaker Server version is `min_version` under SRV-01, and the most Full Access accounts allowed is `max_full_access` under FIL-01.
 - **Check logic** is in `audit/rules.py`, one function per check ID.
 - **Bump `RULESET_VERSION`** in `audit/__init__.py` when you change a check, so reports show which standard they were run against.
-- After a change, run `python scripts/build_sample.py` to regenerate the sample report, then `python -m pytest`.
+- After a change, run `python scripts/build_sample.py` to regenerate the sample report, then `python -m pytest`. Then update `docs/sample-report.pdf` by printing `docs/sample-report.html` to PDF from a browser.
 
 Keep the minimum FileMaker Server version current with Claris's published security updates.
 

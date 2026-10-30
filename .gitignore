@@ -15,6 +15,7 @@ audits/*
 !samples/**/*.xml
 *.pdf
 !samples/**/*.pdf
+!docs/*.pdf
 
 # Python
 __pycache__/
