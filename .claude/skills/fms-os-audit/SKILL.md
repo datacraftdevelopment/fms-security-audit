@@ -12,7 +12,7 @@ The consultant has only remote desktop access (RDP or Screen Sharing). No SSH, n
    - **Windows:** in the RDP session, right-click Start, open Terminal (Admin) or PowerShell with Run as administrator, paste, press Enter.
    - **Mac:** in the Screen Sharing session, open Terminal, paste, press Return, and enter the admin password once when sudo asks.
 3. The script prints a block between `----- FMS-AUDIT OS BEGIN v1 -----` and `----- FMS-AUDIT OS END -----` and copies it to the server's clipboard. Ask them to copy it back to their laptop (by hand if the clipboard doesn't sync).
-4. Run `python -m audit os-import --out audits/<slug>/<date>/os.json`. It reads the clipboard and verifies the checksum. If the checksum fails, the block was cut off; ask them to copy it again.
+4. Run `python -m audit os-import --out audits/<slug>/<date>/`. It reads the clipboard and verifies the checksum. If the checksum fails, the block was cut off; ask them to copy it again.
 5. If they couldn't run as administrator, that's fine: admin-only checks show as Not checked. Mention it in the summary.
 6. Remind them to close the terminal window on the server.
 
