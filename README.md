@@ -10,6 +10,8 @@ Nothing is installed on the server and nothing on it is changed.
 
 **[Consultant guide](docs/consultant-guide.html)** · **[Sample report](docs/sample-report.html)** (fictitious client) · **[The checks in plain language](checklists/best-practices.md)**
 
+The checks build on Claris's own guidance: **[Protecting FileMaker Server from automated attacks](https://support.claris.com/s/article/Protecting-FileMaker-Server-from-automated-attacks)**. Read it before your first audit; the report's recommendations line up with it.
+
 > **Status: version 0.1.** It is tested end to end on fictitious data, and the XML parser is tested against a real FileMaker 26 export. It has not yet been run against a live client server. Until it has, some checks may show as Not checked where a server returns data in a shape the collector doesn't expect. That is safe: the report never guesses.
 
 ---
