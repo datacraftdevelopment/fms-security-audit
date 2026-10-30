@@ -78,7 +78,7 @@ Missing one of these doesn't stop the audit. The checks that depend on it show a
 ## Install
 
 ```bash
-git clone https://github.com/joe-rcc/fms-security-audit.git
+git clone https://github.com/datacraftdevelopment/fms-security-audit.git
 cd fms-security-audit
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
