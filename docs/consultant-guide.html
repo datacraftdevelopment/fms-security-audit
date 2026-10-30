@@ -84,7 +84,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   <div class="eyebrow">Consultant guide</div>
   <h1>FileMaker Security Audit</h1>
   <p class="lead">What the audit is, what you need before you start, and every step from opening the repo to handing the client their report.</p>
-  <div class="meta">Draft v0.1 &middot; October 2026 &middot; Command names are the planned ones and may change as the repo is built.</div>
+  <div class="meta">Version 0.1 &middot; October 2026 &middot; Not yet tried against a live server; report anything that shows Not checked unexpectedly.</div>
 </header>
 
 <nav class="toc" aria-label="Contents">
@@ -165,7 +165,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   <li>
     <h3>Log in at the local prompt <span class="who">You</span></h3>
     <p>In a separate terminal window, not the agent chat:</p>
-    <pre><code>python -m audit.login fms.example.com</code></pre>
+    <pre><code>python -m audit login fms.example.com</code></pre>
     <p>Type the Admin Console password, and the OttoFMS credentials if asked. They go into your computer's keychain. The agent never sees them.</p>
   </li>
   <li>
@@ -186,7 +186,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   </li>
   <li>
     <h3>Close out <span class="who">You</span></h3>
-    <pre><code>python -m audit.logout fms.example.com</code></pre>
+    <pre><code>python -m audit logout fms.example.com</code></pre>
     <p>Deliver the PDF, copy the engagement folder to RCC's client storage, and work through the <a href="#close">close-out checklist</a>.</p>
   </li>
 </ol>
@@ -199,7 +199,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   <div>
     <h4>Windows server (RDP)</h4>
     <ol>
-      <li>On your laptop: <code>python -m audit.os-script win</code></li>
+      <li>On your laptop: <code>python -m audit os-script win</code></li>
       <li>In the RDP session, right-click Start, open <strong>Terminal (Admin)</strong> or <strong>PowerShell</strong> with Run as administrator.</li>
       <li>Paste and press Enter.</li>
       <li>When it finishes, the result block is already on the clipboard.</li>
@@ -208,7 +208,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   <div>
     <h4>Mac server (Screen Sharing)</h4>
     <ol>
-      <li>On your laptop: <code>python -m audit.os-script mac</code></li>
+      <li>On your laptop: <code>python -m audit os-script mac</code></li>
       <li>In the Screen Sharing session, open <strong>Terminal</strong>.</li>
       <li>Paste and press Return. Enter the admin password once when sudo asks.</li>
       <li>When it finishes, the result block is already on the clipboard.</li>
@@ -216,13 +216,13 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   </div>
 </div>
 <p>Back on your laptop:</p>
-<pre><code>python -m audit.os-import</code></pre>
+<pre><code>python -m audit os-import</code></pre>
 <p>This reads your clipboard, checks the block's checksum, and saves <code>os.json</code> in the engagement folder. The result looks like this:</p>
 <pre><code>----- FMS-AUDIT OS BEGIN v1 -----
 H4sIAAAAAAAAA+1YW2/bNhR+z68g9Lwl1t0O0IeiSLEB...
 sha256: 9f2c...e41a
 ----- FMS-AUDIT OS END -----</code></pre>
-<div class="note">If the clipboard doesn't come across, select everything from BEGIN to END in the server window, copy it by hand, and run <code>os-import</code> again.</div>
+<div class="note">If the clipboard doesn't come across, select everything from BEGIN to END in the server window, copy it by hand, and run <code>audit os-import</code> again.</div>
 <h3>Without admin rights</h3>
 <p>The script still runs and marks what it couldn't read as Not checked, with the reason. That's acceptable, but say so in the summary.</p>
 <table>
@@ -252,7 +252,7 @@ sha256: 9f2c...e41a
 <table>
   <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
   <tbody>
-    <tr><td>Admin API login fails</td><td>Check you can open the Admin Console in a browser from your laptop. If not, it's a network or VPN issue. Re-run <code>audit.login</code> if the password was mistyped.</td></tr>
+    <tr><td>Admin API login fails</td><td>Check you can open the Admin Console in a browser from your laptop. If not, it's a network or VPN issue. Re-run <code>audit login</code> if the password was mistyped.</td></tr>
     <tr><td>Certificate warning on connect</td><td>Don't bypass it silently. The agent records it as a finding; continue only with the client's OK.</td></tr>
     <tr><td>Clipboard doesn't sync over RDP</td><td>Check clipboard redirection is on in your RDP client, or copy the block by hand.</td></tr>
     <tr><td>Checksum fails on import</td><td>The block was cut off. Copy again from BEGIN to END.</td></tr>
@@ -267,7 +267,7 @@ sha256: 9f2c...e41a
 <ul class="check">
   <li>Report reviewed end to end, summary written</li>
   <li>PDF delivered to the client's named contact</li>
-  <li><code>audit.logout</code> run; nothing stored in your keychain for this client</li>
+  <li><code>audit logout</code> run; nothing stored in your keychain for this client</li>
   <li>Client asked to rotate the Admin Console password and revoke any temporary OttoFMS key</li>
   <li>Engagement folder copied to RCC client storage</li>
   <li>Local engagement folder deleted after 90 days</li>

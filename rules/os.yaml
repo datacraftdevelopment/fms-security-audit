@@ -1,0 +1,48 @@
+# Operating system checks, read by the pasted OS script.
+- id: OS-01
+  title: Listening ports
+  params:
+    # FileMaker Server ports, plus standard Windows service ports that are always present.
+    expected_ports: [80, 443, 5003, 5013, 16000, 16001, 16002, 16003, 16004, 16021, 3000, 8998, 9889, 1895, 50003, 50004, 135, 5985, 47001]
+    # Dynamic ports used by Windows RPC; not reported individually.
+    ignore_from_port: 49152
+  remediation: Identify each unexpected listening program and remove or firewall it if it isn't needed.
+- id: OS-02
+  title: Remote access services
+  params:
+    remote_ports: {22: SSH, 3389: RDP, 445: SMB, 5900: VNC, 5938: TeamViewer, 7070: AnyDesk}
+    remote_processes: [teamviewer, anydesk, vnc, splashtop, logmein, screenconnect]
+  remediation: Confirm each remote access service is needed and limited to known users and addresses; remove the rest.
+- id: OS-03
+  title: Firewall
+  remediation: Turn every firewall profile on, with inbound rules only for 443 and 5003 plus remote access from known addresses.
+- id: OS-04
+  title: OS version
+  params:
+    windows_end_of_support:
+      "Windows Server 2012": "2023-10-10"
+      "Windows Server 2016": "2027-01-12"
+      "Windows Server 2019": "2029-01-09"
+      "Windows Server 2022": "2031-10-14"
+      "Windows Server 2025": "2034-10-10"
+    min_macos_major: 14
+  remediation: Move to a supported operating system version that the installed FileMaker Server supports.
+- id: OS-05
+  title: Patching
+  params: {max_days: 45}
+  remediation: Install pending operating system updates and keep automatic updates on, with a maintenance window for restarts.
+- id: OS-06
+  title: Local administrators
+  params:
+    shared_names: [fmadmin, filemaker, admin, shared, test, temp, user, support]
+  remediation: Replace shared administrator accounts with named accounts, and keep the administrators group small.
+- id: OS-07
+  title: Disk encryption
+  remediation: Turn on BitLocker (Windows) or FileVault (Mac) for volumes holding FileMaker data and backups.
+- id: OS-08
+  title: Antivirus
+  params: {max_signature_age_days: 7}
+  remediation: Run an up-to-date antivirus product with real-time protection.
+- id: OS-09
+  title: Antivirus exclusions
+  remediation: Exclude the live FileMaker database folder from real-time scanning, as Claris recommends, and scan backups instead.

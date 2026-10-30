@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Audit Report{% if client %}: {{ client }}{% endif %}</title>
+<style>
+:root {
+  --bg: #f6f5f2; --page: #ffffff; --ink: #1d1d1b; --muted: #5f5e5a; --line: #e4e1da; --head: #faf9f6;
+  --accent: #1f5f8b;
+  --pass: #2f6b3a; --pass-bg: #e5f2e7; --warn: #8a5a00; --warn-bg: #fbf1dc;
+  --fail: #9b2c2c; --fail-bg: #fbe9e9; --nc: #55534e; --nc-bg: #eceae5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --page: #1d1d1b; --ink: #ecebe7; --muted: #a8a69f; --line: #34332f; --head: #242422;
+    --accent: #7db4dc;
+    --pass: #8fc79a; --pass-bg: #1f3123; --warn: #e2b866; --warn-bg: #33291a;
+    --fail: #e79a9a; --fail-bg: #3a2222; --nc: #c4c2bb; --nc-bg: #2c2c29;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.page { max-width: 900px; margin: 32px auto; background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 48px 56px; }
+.sample { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); border-radius: 8px; padding: 8px 14px; font-size: 14px; margin-bottom: 28px; }
+.cover { border-bottom: 2px solid var(--ink); padding-bottom: 24px; margin-bottom: 8px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1 { font-size: 32px; line-height: 1.2; margin: 6px 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 17px; margin: 26px 0 8px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 24px; font-size: 14px; }
+.facts div span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.tally { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+.tally div { border-radius: 10px; padding: 12px 14px; }
+.tally b { display: block; font-size: 28px; line-height: 1.1; }
+.tally .f { background: var(--fail-bg); color: var(--fail); }
+.tally .w { background: var(--warn-bg); color: var(--warn); }
+.tally .p { background: var(--pass-bg); color: var(--pass); }
+.tally .n { background: var(--nc-bg); color: var(--nc); }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--head); }
+td.id { white-space: nowrap; color: var(--muted); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.s { display: inline-block; min-width: 86px; text-align: center; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.s.pass { background: var(--pass-bg); color: var(--pass); }
+.s.warn { background: var(--warn-bg); color: var(--warn); }
+.s.fail { background: var(--fail-bg); color: var(--fail); }
+.s.nc { background: var(--nc-bg); color: var(--nc); }
+.muted { color: var(--muted); }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.file-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.file-head .mini { font-size: 13px; color: var(--muted); }
+ol.fix > li { margin-bottom: 12px; }
+ol.fix b { font-weight: 700; }
+.disclaimer { break-inside: avoid; }
+blockquote { margin: 12px 0; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--head); font-size: 14px; }
+footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 720px) {
+  .page { margin: 0; border-radius: 0; border-left: 0; border-right: 0; padding: 28px 16px; }
+  .facts { grid-template-columns: 1fr 1fr; }
+  .tally { grid-template-columns: 1fr 1fr; }
+  .scroll { overflow-x: auto; }
+  h1 { font-size: 26px; }
+}
+@media print {
+  body { background: #fff; }
+  .page { border: 0; margin: 0; padding: 0; max-width: none; }
+  h2 { break-after: avoid; }
+  section.file, table { break-inside: avoid; }
+  .new-page { break-before: page; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+{% set label = {"pass": "Pass", "warn": "Warn", "fail": "Fail", "nc": "Not checked"} %}
+{% macro table(rows) -%}
+<div class="scroll">
+<table>
+  <thead><tr><th>ID</th><th>Check</th><th>Status</th><th>Finding</th></tr></thead>
+  <tbody>
+  {%- for r in rows %}
+    <tr><td class="id">{{ r.id }}</td><td>{{ r.title }}</td><td><span class="s {{ r.status }}">{{ label[r.status] }}</span>{% if r.change == "new" %} <span class="muted">new</span>{% endif %}</td><td>{{ r.finding }}</td></tr>
+  {%- endfor %}
+  </tbody>
+</table>
+</div>
+{%- endmacro %}
+{% if sample %}<div class="sample"><strong>Sample report.</strong> {{ client }}, its server and every finding below are fictitious, made up to show what a client receives.</div>{% endif %}
+
+<section class="cover">
+  <div class="eyebrow">FileMaker Security Audit</div>
+  <h1>{{ client }}: FileMaker Server and Files</h1>
+  <div class="facts">
+    <div><span>Client</span>{{ client }}</div>
+    <div><span>Audit date</span>{{ date_long }}</div>
+    <div><span>Prepared by</span>{{ consultant or "Consultant" }}</div>
+    <div><span>Server</span>{{ server }}</div>
+    <div><span>Platform</span>{{ platform }}</div>
+    <div><span>Rule set</span>v{{ ruleset }}</div>
+  </div>
+</section>
+
+<section>
+<h2>Executive summary</h2>
+{% if summary %}<p>{{ summary }}</p>{% else %}<p class="muted">Summary to be written by the consultant.</p>{% endif %}
+<div class="tally" role="list" aria-label="Results across {{ total }} checks">
+  <div class="f" role="listitem"><b>{{ counts.fail }}</b>Fail</div>
+  <div class="w" role="listitem"><b>{{ counts.warn }}</b>Warn</div>
+  <div class="p" role="listitem"><b>{{ counts.pass }}</b>Pass</div>
+  <div class="n" role="listitem"><b>{{ counts.nc }}</b>Not checked</div>
+</div>
+<p class="muted">{{ total }} checks: {{ server_rows|length }} server, {{ os_rows|length }} operating system, and {{ file_rule_count }} for each of {{ file_sections|length }} file{{ "s" if file_sections|length != 1 }}.</p>
+{% if fixed %}<p><strong>Fixed since the last audit:</strong> {% for r in fixed %}{{ r.title }} ({{ r.id }}{% if r.scope not in ("server", "os") %}, {{ r.scope }}{% endif %}){{ ", " if not loop.last }}{% endfor %}.</p>{% endif %}
+</section>
+
+<section>
+<h2>Scope and method</h2>
+<p>We reviewed the configuration of one FileMaker Server and the {{ file_sections|length }} file{{ "s" if file_sections|length != 1 }} it hosts as of {{ date_long }}, against best-practice rule set v{{ ruleset }}. Server settings were read through the FileMaker Admin API. Operating system settings were read by a read-only script run in a remote desktop session. File security was read from an accounts-only XML export of each file. Nothing was installed or changed on the server.</p>
+<p><strong>Not covered:</strong> account passwords and password policy, ongoing monitoring, log review, and any testing from outside {{ client }}'s network. Items marked Not checked could not be read and should not be read as passing.</p>
+</section>
+
+<section class="new-page">
+<h2>Server checklist</h2>
+{{ table(server_rows) }}
+</section>
+
+<section>
+<h2>Operating system checklist</h2>
+{{ table(os_rows) }}
+</section>
+
+<section class="new-page">
+<h2>File audits</h2>
+{% for fs in file_sections %}
+<section class="file">
+<div class="file-head"><h3>{{ fs.name }}</h3><span class="mini">{% if fs.info %}{{ fs.info.accounts|length }} accounts &middot; {{ fs.info.privilege_sets|length }} privilege sets &middot; {% endif %}{{ fs.counts.fail }} fail, {{ fs.counts.warn }} warn, {{ fs.counts.pass }} pass{% if fs.counts.nc %}, {{ fs.counts.nc }} not checked{% endif %}</span></div>
+{{ table(fs.rows) }}
+{% if fs.elevated %}
+<p class="muted" style="margin-top:14px">Accounts with Full Access</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Account</th><th>Privilege set</th><th>Status</th><th>Type</th></tr></thead>
+  <tbody>
+  {%- for a in fs.elevated %}
+    <tr><td>{{ a.name }}</td><td>{{ a.privilege_set }}</td><td>{{ "Active" if a.active else "Inactive" }}</td><td>{{ a.type }}</td></tr>
+  {%- endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+</section>
+{% endfor %}
+</section>
+
+<section class="new-page">
+<h2>Remediation plan</h2>
+{% if plan %}
+<p>Fails first, then warnings. Each is a change {{ client }}'s administrator can make; we can help on request.</p>
+<ol class="fix">
+{% for item in plan %}
+  <li><b>{{ item.title }}{% if item.scopes %} ({{ item.scopes }}){% endif %}.</b> {{ item.remediation }}</li>
+{% endfor %}
+</ol>
+{% else %}<p>No fails or warnings.</p>{% endif %}
+</section>
+
+<section>
+<h2>Appendix</h2>
+<h3>Accounts by file</h3>
+{% for f in files %}
+<p class="muted">{{ f.name }}</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Account</th><th>Privilege set</th><th>Status</th><th>Type</th></tr></thead>
+  <tbody>
+  {%- for a in f.accounts %}
+    <tr><td>{{ a.name }}</td><td>{{ a.privilege_set }}</td><td>{{ "Active" if a.active else "Inactive" }}</td><td>{{ a.type }}</td></tr>
+  {%- endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}<p class="muted">No file exports were provided.</p>{% endfor %}
+{% if plugins %}<h3>Plug-ins</h3><p>{{ plugins|join(", ") }}</p>{% endif %}
+<p class="muted">Rule definitions: rules/server.yaml, rules/os.yaml and rules/files.yaml in rule set v{{ ruleset }}.</p>
+</section>
+
+<section class="disclaimer">
+<h2>Disclaimer</h2>
+<blockquote>This report is a point-in-time review of {{ client }}'s FileMaker Server and files as configured on {{ date_long }}, against the checks listed in Scope and method. {{ firm }} has made a good-faith effort to find common security weaknesses and recommend improvements, but {{ firm }} does not manage, monitor or take responsibility for {{ client }}'s servers, files or security. This review is not continuous monitoring and does not cover items marked Not checked, account passwords, or changes made after the audit date. A report with no failures does not guarantee a system is secure. {{ client }} remains responsible for its servers and files, and for deciding on and carrying out any remediation. {{ firm }} can help with remediation on request under a separate engagement.</blockquote>
+</section>
+
+<footer><span>{{ client }} &middot; FileMaker Security Audit &middot; {{ date_long }}</span><span>{% if sample %}Sample report, fictitious data{% else %}Confidential{% endif %}</span></footer>
+</main>
+</body>
+</html>

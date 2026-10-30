@@ -2,7 +2,7 @@
 
 A best-practice security audit for a FileMaker Server and the files it hosts, run by a consultant from their own laptop with Claude Code or Codex. You get a dated report with three parts: a server checklist, an operating system checklist, and an account and privilege audit for each file.
 
-> **Status: under construction.** The guide, sample report and agent instructions are here. The audit code and scripts are being built. Commands in this README are the planned ones.
+> **Status: version 0.1.** Everything runs and is tested against fictitious sample data. It has not yet been tried against a live FileMaker Server, so expect some checks to show Not checked until the collector is tuned to real responses. OttoFMS checks are not built yet.
 
 **[Read the consultant guide](docs/consultant-guide.html)** · **[See a sample report](docs/sample-report.html)** (fictitious client)
 
@@ -35,7 +35,7 @@ What it does **not** do: monitor the server over time, review logs, test passwor
 ## How a run works
 
 1. The agent creates a folder for the audit under `audits/<client>/<date>/`.
-2. You log in at a local prompt (`python -m audit.login <host>`). Passwords go to your computer's keychain, never into the chat.
+2. You log in at a local prompt (`python -m audit login <host>`). Passwords go to your computer's keychain, never into the chat.
 3. The agent reads the server settings over HTTPS.
 4. You paste one read-only script into PowerShell or Terminal in your remote desktop session and copy the result back.
 5. You save an accounts-only XML of each file into the audit's `xml/` folder.

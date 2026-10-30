@@ -1,0 +1,31 @@
+{
+  "platform": "windows",
+  "schema": 1,
+  "collected_at": "2026-10-30T15:10:42Z",
+  "hostname": "FMS01",
+  "elevated": true,
+  "not_checked": {},
+  "os": {"name": "Microsoft Windows Server 2019 Standard", "version": "10.0.17763", "build": "17763"},
+  "listeners": [
+    {"port": 80, "address": "0.0.0.0", "pid": 4120, "process": "httpd"},
+    {"port": 135, "address": "0.0.0.0", "pid": 912, "process": "svchost"},
+    {"port": 443, "address": "0.0.0.0", "pid": 4120, "process": "httpd"},
+    {"port": 3389, "address": "0.0.0.0", "pid": 1180, "process": "svchost"},
+    {"port": 5003, "address": "0.0.0.0", "pid": 3876, "process": "fmserver"},
+    {"port": 7070, "address": "0.0.0.0", "pid": 5502, "process": "AnyDesk"},
+    {"port": 8080, "address": "0.0.0.0", "pid": 6310, "process": "java"},
+    {"port": 16000, "address": "127.0.0.1", "pid": 3990, "process": "fmsased"},
+    {"port": 16001, "address": "0.0.0.0", "pid": 4012, "process": "node"},
+    {"port": 49664, "address": "0.0.0.0", "pid": 700, "process": "lsass"}
+  ],
+  "firewall": {
+    "profiles": [{"name": "Domain", "enabled": true}, {"name": "Private", "enabled": true}, {"name": "Public", "enabled": false}],
+    "broad_allow_rules": [{"name": "FileMaker Server", "ports": "5003"}]
+  },
+  "patching": {"last_installed": "2026-08-29", "auto_updates": null},
+  "local_admins": ["EXAMPLE\\Administrator", "EXAMPLE\\Domain Admins", "EXAMPLE\\jsmith", "FMS01\\fmadmin", "EXAMPLE\\itlead"],
+  "disk_encryption": [{"volume": "C:", "encrypted": true}, {"volume": "D:", "encrypted": true}],
+  "antivirus": {"products": [{"name": "Microsoft Defender", "running": true, "signature_age_days": 1}]},
+  "av_exclusions": [],
+  "fms_data_paths": ["C:\\Program Files\\FileMaker\\FileMaker Server\\Data\\Databases"]
+}

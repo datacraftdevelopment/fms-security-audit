@@ -1,0 +1,32 @@
+# Server checks, read through the FileMaker Admin API.
+- id: SRV-01
+  title: FileMaker Server version
+  params:
+    # Verify against Claris security bulletins before each release of this rule set.
+    min_version: "22.0.4"
+  remediation: Update FileMaker Server to the minimum safe version or later, after a verified backup and in a maintenance window.
+- id: SRV-02
+  title: SSL certificate
+  params: {warn_days: 30, default_issuers: ["Claris", "FileMaker"]}
+  remediation: Install a certificate from a trusted authority for the server's hostname and renew it before it expires.
+- id: SRV-03
+  title: Encryption at rest
+  remediation: Encrypt each unencrypted file with the FileMaker Developer Utility, then host the encrypted copy.
+- id: SRV-04
+  title: Host password-protected files only
+  remediation: Turn on "Host password-protected databases only" in the Admin Console.
+- id: SRV-05
+  title: Web technologies
+  remediation: Turn off every web technology (Data API, OData, WebDirect, XML, PHP) the client doesn't use.
+- id: SRV-06
+  title: Backup schedules
+  remediation: Keep at least one enabled backup schedule, check its results regularly, and test a restore.
+- id: SRV-07
+  title: Script schedules
+  remediation: Run scheduled scripts under a dedicated account with only the privileges the script needs.
+- id: SRV-08
+  title: Plug-ins
+  remediation: Remove plug-ins that are no longer used and keep the rest up to date.
+- id: SRV-09
+  title: OttoFMS
+  remediation: Keep OttoFMS up to date and give every API key an expiry date.

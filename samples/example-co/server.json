@@ -1,0 +1,24 @@
+{
+  "host": "fms.example.com",
+  "collected_at": "2026-10-30T15:02:11+00:00",
+  "version": "22.0.2",
+  "require_secure_db": true,
+  "files": [
+    {"name": "Invoices.fmp12", "encrypted": true, "ext_privs": ["fmapp", "fmrest"]},
+    {"name": "Contacts.fmp12", "encrypted": false, "ext_privs": ["fmapp", "fmodata"]},
+    {"name": "Inventory.fmp12", "encrypted": true, "ext_privs": ["fmapp"]}
+  ],
+  "webtech": {"dataapi": true, "odata": true, "webdirect": false, "xml": false, "php": false},
+  "schedules": [
+    {"name": "Daily backup", "type": "BACKUP", "enabled": true, "account": null, "last_result": "OK", "last_run": "2026-10-30T02:00:00"},
+    {"name": "Nightly import", "type": "SCRIPT", "enabled": true, "account": "Admin", "last_result": "OK", "last_run": "2026-10-30T01:00:00"}
+  ],
+  "clients": [
+    {"account": "frontdesk", "machine": "FD-PC1"},
+    {"account": "frontdesk", "machine": "FD-PC2"},
+    {"account": "frontdesk", "machine": "LAPTOP-07"},
+    {"account": "jsmith", "machine": "JS-MAC"}
+  ],
+  "plugins": ["ExamplePDF", "ExampleCharts"],
+  "certificate": {"trusted": true, "issuer": "commonName=Example Trusted CA", "subject": "commonName=fms.example.com", "expires": "2026-11-20", "error": null}
+}

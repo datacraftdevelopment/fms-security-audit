@@ -10,7 +10,7 @@ Follow the walkthrough in `AGENTS.md`, one step at a time. This skill adds the d
 ## Start
 
 1. Ask for the client name, server hostname, and whether the server runs Windows or macOS.
-2. Make a slug from the client name (lowercase, hyphens) and copy `audits/_template/` to `audits/<slug>/<YYYY-MM-DD>/`.
+2. Run `python -m audit new "<Client Name>" --server <host>`. It creates `audits/<slug>/<YYYY-MM-DD>/` from the template.
 3. If an earlier audit folder exists for this client, note it; fms-report will compare against it.
 
 ## Judgment questions
@@ -30,4 +30,4 @@ Each step can be skipped if its access isn't available. Its checks then show as 
 
 ## Finish
 
-Remind the consultant to run `python -m audit.logout <host>` in their terminal, deliver the PDF, move the audit folder to secure storage, and ask the client to rotate any credentials they lent.
+Remind the consultant to run `python -m audit logout <host>` in their terminal, deliver the PDF, move the audit folder to secure storage, and ask the client to rotate any credentials they lent.

@@ -1,0 +1,32 @@
+# Per-file checks, read from accounts-only Save as XML exports.
+- id: FIL-01
+  title: Full Access accounts
+  params: {max_full_access: 2}
+  remediation: Move staff to privilege sets that match their work, and keep Full Access to two named administrators.
+- id: FIL-02
+  title: Default account names
+  params: {default_names: [admin, administrator]}
+  remediation: Rename or disable default accounts such as Admin and give administrators named accounts.
+- id: FIL-03
+  title: Guest account
+  remediation: Disable the Guest account so every user must sign in.
+- id: FIL-04
+  title: Everyone on one privilege set
+  params: {share_threshold: 0.8}
+  remediation: Split users across privilege sets that match their roles.
+- id: FIL-05
+  title: Wide privilege sets
+  remediation: Remove layout, script, value list and account management rights from sets used by non-developers.
+- id: FIL-06
+  title: Export and print
+  remediation: Turn off exporting and printing in the sets the client wants restricted.
+- id: FIL-07
+  title: Extended privileges
+  params: {watched: [fmrest, fmodata, fmwebdirect, fmxml]}
+  remediation: Remove web and API extended privileges from privilege sets that don't need them.
+- id: FIL-08
+  title: Shared logins
+  remediation: Give each person their own account.
+- id: FIL-09
+  title: External authentication
+  remediation: Review membership of the mapped directory groups in Active Directory or Entra ID.

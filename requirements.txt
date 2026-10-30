@@ -1,6 +1,8 @@
-# Planned dependencies; pinned when the audit package is built.
-requests
-keyring
-pyyaml
-lxml
-jinja2
+requests>=2.31
+keyring>=24
+pyyaml>=6
+lxml>=5
+jinja2>=3.1
+pytest>=8
+# Optional: PDF export (python -m audit report <folder> --pdf)
+# playwright>=1.44   then: python -m playwright install chromium

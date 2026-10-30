@@ -2,6 +2,9 @@
 client: ""
 server: ""
 platform: ""            # windows or mac
+consultant: ""
+firm: ""                # shown in the disclaimer, e.g. RCC
+summary: ""             # executive summary, written after reviewing findings
 ottofms_installed: null # true or false
 developer_accounts: []  # accounts that legitimately need Full Access
 data_api_sets: []       # privilege sets that genuinely need fmrest

@@ -1,0 +1,19 @@
+# Fictitious client used for tests and docs/sample-report.html.
+client: "Example Co"
+server: "fms.example.com"
+platform: windows
+audit_date: 2026-10-30
+consultant: "RCC consultant"
+firm: "RCC"
+ottofms_installed: false
+developer_accounts: [rcc.dev, itlead]
+data_api_sets: [Web Form]
+odata_sets: []
+webdirect_sets: []
+export_denied_sets: [Read Only]
+summary: >-
+  Example Co's server is backed up nightly and its Inventory file is close to how it was set up,
+  but security has drifted since. The most serious issues are an out-of-date FileMaker Server
+  version, a firewall profile turned off, one file without encryption at rest, and the Invoices
+  file, where 9 of 14 accounts have Full Access and everyday staff can use the Data API. The
+  Contacts file also allows Guest access. None of these needs downtime to fix except the server update.

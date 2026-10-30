@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fictitious sample for tests. Element names approximate FileMaker's Save as XML output. -->
+<FMSaveAsXML version="2.2.3.0" Source="22.0" File="Inventory.fmp12">
+  <Structure>
+    <AddAction>
+      <PrivilegeSetsCatalog>
+      <PrivilegeSet id="684" name="[Full Access]" comment="">
+        <Records value="create, edit and delete in all tables"/>
+        <Layouts value="all modifiable"/>
+        <ValueLists value="all modifiable"/>
+        <Scripts value="all modifiable"/>
+        <Exporting value="True"/>
+        <Printing value="True"/>
+        <ManageAccounts value="True"/>
+      </PrivilegeSet>
+      <PrivilegeSet id="542" name="[Read-Only Access]" comment="">
+        <Records value="view only"/>
+        <Layouts value="view only"/>
+        <ValueLists value="view only"/>
+        <Scripts value="executable only"/>
+        <Exporting value="False"/>
+        <Printing value="True"/>
+        <ManageAccounts value="False"/>
+      </PrivilegeSet>
+      <PrivilegeSet id="746" name="Warehouse" comment="">
+        <Records value="create, edit and delete in all tables"/>
+        <Layouts value="view only"/>
+        <ValueLists value="all modifiable"/>
+        <Scripts value="executable only"/>
+        <Exporting value="False"/>
+        <Printing value="True"/>
+        <ManageAccounts value="False"/>
+      </PrivilegeSet>
+      <PrivilegeSet id="297" name="Office" comment="">
+        <Records value="create and edit in all tables"/>
+        <Layouts value="view only"/>
+        <ValueLists value="view only"/>
+        <Scripts value="executable only"/>
+        <Exporting value="False"/>
+        <Printing value="True"/>
+        <ManageAccounts value="False"/>
+      </PrivilegeSet>
+      </PrivilegeSetsCatalog>
+      <ExtendedPrivilegesCatalog>
+      <ExtendedPrivilege id="67" name="fmapp">
+        <PrivilegeSetReference name="[Full Access]"/>
+        <PrivilegeSetReference name="Warehouse"/>
+        <PrivilegeSetReference name="Office"/>
+      </ExtendedPrivilege>
+      </ExtendedPrivilegesCatalog>
+      <AccountsCatalog>
+      <Account id="184" name="[Guest]" status="Inactive" type="FileMaker">
+        <PrivilegeSetReference name="[Read-Only Access]"/>
+      </Account>
+      <Account id="710" name="rcc.dev" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="[Full Access]"/>
+      </Account>
+      <Account id="294" name="itlead" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="[Full Access]"/>
+      </Account>
+      <Account id="818" name="wh1" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="Warehouse"/>
+      </Account>
+      <Account id="772" name="wh2" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="Warehouse"/>
+      </Account>
+      <Account id="918" name="wh3" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="Warehouse"/>
+      </Account>
+      <Account id="352" name="off1" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="Office"/>
+      </Account>
+      <Account id="821" name="off2" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="Office"/>
+      </Account>
+      <Account id="409" name="off3" status="Active" type="FileMaker">
+        <PrivilegeSetReference name="Office"/>
+      </Account>
+      </AccountsCatalog>
+    </AddAction>
+  </Structure>
+</FMSaveAsXML>
