@@ -8,7 +8,7 @@ A best-practice security audit for a FileMaker Server and the files it hosts. Yo
 
 Nothing is installed on the server and nothing on it is changed.
 
-**[Consultant guide](docs/consultant-guide.html)** · **[Sample report](docs/sample-report.html)** (fictitious client) · **[The checks in plain language](checklists/best-practices.md)**
+**[Consultant workflow guide](docs/consultant-guide.html)** (the whole audit on one page) · **[Sample report](docs/sample-report.html)** (fictitious client) · **[The checks in plain language](checklists/best-practices.md)**
 
 > **Status: version 0.1.** It is tested end to end on fictitious data, and the XML parser is tested against a real FileMaker 26 export. It has not yet been run against a live client server. Until it has, some checks may show as Not checked where a server returns data in a shape the collector doesn't expect. That is safe: the report never guesses.
 
