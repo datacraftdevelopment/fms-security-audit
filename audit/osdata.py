@@ -7,6 +7,7 @@ import json
 import re
 
 BEGIN = "----- FMS-AUDIT OS BEGIN v1 -----"
+LIST_FIELDS = ("listeners", "local_admins", "disk_encryption", "av_exclusions", "fms_data_paths")
 END = "----- FMS-AUDIT OS END -----"
 
 
@@ -37,4 +38,28 @@ def decode(text):
         raise BlockError("The block is damaged; copy it again from BEGIN to END.") from exc
     if hashlib.sha256(raw).hexdigest() != sha_line.split(":", 1)[1].strip():
         raise BlockError("Checksum mismatch; the block was cut off or altered. Copy it again.")
-    return json.loads(raw.decode("utf-8"))
+    return normalize(json.loads(raw.decode("utf-8")))
+
+
+def normalize(data):
+    """Wrap bare values back into lists.
+
+    PowerShell unrolls a one-element array into a single object, so a block from an
+    older Windows script could carry one listener, one admin or one volume as a
+    scalar. The rules expect lists.
+    """
+    def listify(v):
+        return v if v is None or isinstance(v, list) else [v]
+
+    for key in LIST_FIELDS:
+        if key in data:
+            data[key] = listify(data[key])
+    av = data.get("antivirus")
+    if isinstance(av, dict) and "products" in av:
+        av["products"] = listify(av["products"])
+    fw = data.get("firewall")
+    if isinstance(fw, dict):
+        for key in ("profiles", "broad_allow_rules"):
+            if key in fw:
+                fw[key] = listify(fw[key])
+    return data

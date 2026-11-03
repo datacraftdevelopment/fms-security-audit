@@ -10,9 +10,11 @@ audits/*
 *.key
 *.pem
 
-# Exports and reports anywhere outside samples
+# Exports and reports anywhere outside samples and test fixtures
 *.xml
 !samples/**/*.xml
+!tests/fixtures/
+!tests/fixtures/**
 *.pdf
 !samples/**/*.pdf
 

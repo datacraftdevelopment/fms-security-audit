@@ -126,9 +126,9 @@ def parse_file(path):
 def parse_folder(folder, delete=True):
     folder = Path(folder)
     xml_dir = folder / "xml"
-    files = []
-    for path in sorted(xml_dir.glob("*.xml")):
-        files.append(parse_file(path))
-        if delete:
+    paths = sorted(xml_dir.glob("*.xml"))
+    files = [parse_file(path) for path in paths]  # a bad export raises here, before anything is deleted
+    if delete:
+        for path in paths:
             path.unlink()
     return {"files": files}

@@ -12,7 +12,7 @@ The plain-language standard the rules in `rules/` implement. Every check returns
 | SRV-04 | Host password-protected files only | Setting is off |
 | SRV-05 | Web technologies | Data API, OData, WebDirect, XML or PHP on without a stated need |
 | SRV-06 | Backup schedules | No enabled backup schedule, or last run failed |
-| SRV-07 | Script schedules | Warn on schedules run by a Full Access account |
+| SRV-07 | Script schedules | Warn on schedules run by a Full Access account; Not checked when the API doesn't say which account runs them |
 | SRV-08 | Plug-ins | Listed for review |
 | SRV-09 | OttoFMS | Invalid licence, API keys with no expiry, or expired keys still listed |
 
@@ -28,7 +28,7 @@ The plain-language standard the rules in `rules/` implement. Every check returns
 | OS-06 | Local administrators | Generic or shared admin accounts |
 | OS-07 | Disk encryption | Volume with FileMaker data or backups not encrypted |
 | OS-08 | Antivirus | None running, or signatures older than 7 days |
-| OS-09 | Antivirus exclusions | Live database folder scanned in real time (Claris recommends excluding it) |
+| OS-09 | Antivirus exclusions | Live database folder scanned in real time (Claris recommends excluding it); Windows only, and only when Microsoft Defender is the active antivirus |
 
 ## Files (accounts-only XML)
 
@@ -39,7 +39,7 @@ The plain-language standard the rules in `rules/` implement. Every check returns
 | FIL-03 | Guest account | Enabled |
 | FIL-04 | Everyone on one privilege set | Over 80% of active accounts share a set with broad modify or delete rights |
 | FIL-05 | Wide privilege sets | Non-developer sets that can modify layouts, scripts or value lists, or manage accounts |
-| FIL-06 | Export and print | Allowed where the client said it should not be |
+| FIL-06 | Export and print | Allowed where the client said it should not be; Not checked when the client named no sets |
 | FIL-07 | Extended privileges | fmrest, fmodata, fmwebdirect or fmxml on sets that don't need them |
 | FIL-08 | Shared logins | One account connected from several machines at audit time |
 | FIL-09 | External authentication | Listed; group membership must be reviewed in the directory |

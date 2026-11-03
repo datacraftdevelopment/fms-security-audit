@@ -26,6 +26,16 @@ def _join(items):
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
+def _failed(result):
+    """True when a schedule's last result is a failure: a non-zero error code or a failure word."""
+    if result is None or result == "":
+        return False
+    s = str(result).strip().lower()
+    if s.lstrip("-").isdigit():
+        return int(s) != 0
+    return any(w in s for w in ("fail", "error", "abort"))
+
+
 def _full_access_accounts(files):
     names = set()
     for f in files or []:
@@ -114,10 +124,13 @@ def srv_06(ctx, p):
     enabled = [s for s in backups if s.get("enabled") not in (False, "DISABLED", "disabled")]
     if not enabled:
         return FAIL, "No enabled backup schedule."
-    failed = [s["name"] for s in enabled if str(s.get("last_result", "")).lower() in ("failed", "error")]
+    failed = [s["name"] for s in enabled if _failed(s.get("last_result"))]
     if failed:
         return FAIL, f"Last run failed: {_join(failed)}."
-    return PASS, f"{len(enabled)} enabled backup schedule{'s' if len(enabled) > 1 else ''}, last run succeeded."
+    n = f"{len(enabled)} enabled backup schedule{'s' if len(enabled) > 1 else ''}"
+    if all(s.get("last_result") in (None, "") for s in enabled):
+        return PASS, f"{n}; the Admin API did not report the last result."
+    return PASS, f"{n}, last run succeeded."
 
 
 def srv_07(ctx, p):
@@ -129,7 +142,15 @@ def srv_07(ctx, p):
     if risky:
         return WARN, "; ".join(f"\"{s['name']}\" runs as {s['account']}, which has Full Access" for s in risky) + "."
     scripts = [s for s in sched if "script" in str(s.get("type", "")).lower()]
-    return PASS, f"{len(scripts)} script schedule{'s' if len(scripts) != 1 else ''}, none run as a Full Access account."
+    n = f"{len(scripts)} script schedule{'s' if len(scripts) != 1 else ''}"
+    if not scripts:
+        return PASS, "No script schedules."
+    named = sorted({s["account"] for s in scripts if s.get("account")})
+    if not named:
+        return NC, f"{n}, but the Admin API did not report which account runs them."
+    if ctx.files is None:
+        return NC, f"{n}, running as {_join(named)}. Provide the file exports to check whether those accounts have Full Access."
+    return PASS, f"{n}, none run as a Full Access account."
 
 
 def srv_08(ctx, p):
@@ -388,6 +409,8 @@ def fil_05(ctx, f, p):
 
 def fil_06(ctx, f, p):
     restricted = set(ctx.answers.get("export_denied_sets") or [])
+    if not restricted:
+        return NC, "The client did not name any privilege sets that should be unable to export or print."
     bad = [s["name"] for s in f["privilege_sets"] if s["name"] in restricted and (s.get("export") or s.get("print"))]
     if bad:
         return WARN, f"Export or print allowed in {_join(bad)}, which should be restricted."

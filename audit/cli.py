@@ -33,14 +33,21 @@ def cmd_check(a):
 
 
 def cmd_new(a):
-    slug = re.sub(r"[^a-z0-9]+", "-", a.client.lower()).strip("-")
-    folder = ROOT / "audits" / slug / (a.date or dt.date.today().isoformat())
+    slug = re.sub(r"[^a-z0-9]+", "-", a.client.lower()).strip("-") or "client"
+    date = a.date or dt.date.today().isoformat()
+    try:
+        dt.date.fromisoformat(date)
+    except ValueError:
+        raise SystemExit(f"--date must be YYYY-MM-DD, not {date!r}.")
+    folder = ROOT / "audits" / slug / date
     if folder.exists():
         raise SystemExit(f"{folder} already exists.")
     shutil.copytree(ROOT / "audits" / "_template", folder)
     answers = folder / "answers.yaml"
     text = answers.read_text()
-    text = text.replace('client: ""', f'client: "{a.client}"').replace('server: ""', f'server: "{a.server}"')
+    # json.dumps gives a double-quoted scalar that YAML reads back exactly, whatever the name contains.
+    for key, value in (("client", a.client), ("server", a.server), ("audit_date", date)):
+        text = text.replace(f'{key}: ""', f"{key}: {json.dumps(value)}", 1)
     answers.write_text(text)
     print(folder.relative_to(ROOT))
 

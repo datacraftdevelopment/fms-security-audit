@@ -83,7 +83,7 @@ cd fms-security-audit
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest                 # optional: confirms everything works (12 tests)
+python -m pytest                 # optional: confirms everything works
 ```
 
 For PDF reports, also run:
@@ -233,7 +233,7 @@ Each finding is marked new or unchanged, and a "Fixed since last audit" list sho
 
 - **Passwords** are typed only at the local `login` prompt and stored in the OS keychain (macOS Keychain or Windows Credential Manager). They never appear in files, the repo or the AI conversation. If one ends up in a chat, have the client change it.
 - **Client data** lives only under `audits/`, which git ignores except for the template. Never commit it, attach it to an issue, or paste it into a pull request.
-- **XML exports** can contain password hashes. They are deleted after parsing, and git ignores `*.xml` outside `samples/`.
+- **XML exports** can contain password hashes. They are deleted after parsing, and git ignores `*.xml` outside `samples/` and `tests/fixtures/`. Anything placed in `tests/fixtures/` must be scrubbed first.
 - **Read-only by design:** the HTTP session blocks every request except GET, plus the Admin API login and logout, and a test checks that. The OS scripts only read.
 - **AI processing:** account names and server settings pass through the AI tool you use. Make sure that fits your agreement with the client.
 
@@ -264,7 +264,7 @@ fms-security-audit/
 ├── scripts/                 read-only OS scripts (Windows and Mac) and the sample builder
 ├── docs/                    consultant guide and sample report
 ├── samples/example-co/      fictitious inputs for the tests and the sample report
-├── tests/                   tests, including a scrubbed real FileMaker 26 export
+├── tests/                   tests; tests/fixtures/ holds a scrubbed real FileMaker 26 export
 └── audits/                  your client work (git-ignored)
     ├── _template/           copied for each new audit
     └── <client>/<date>/

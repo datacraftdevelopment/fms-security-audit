@@ -14,6 +14,8 @@
     $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     $r.elevated = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
+    # A block that lists things must end in ",@(...)": PowerShell unrolls a one-element
+    # array into a bare object on the way out of a script block, and the audit expects lists.
     function Read-Section($key, [scriptblock]$block) {
         try { $r[$key] = & $block } catch { $r.not_checked[$key] = $_.Exception.Message }
     }
@@ -24,7 +26,7 @@
     }
 
     Read-Section 'listeners' {
-        @(Get-NetTCPConnection -State Listen | Sort-Object LocalPort, LocalAddress -Unique | ForEach-Object {
+        ,@(Get-NetTCPConnection -State Listen | Sort-Object LocalPort, LocalAddress -Unique | ForEach-Object {
             $p = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
             [ordered]@{ port = [int]$_.LocalPort; address = $_.LocalAddress; pid = [int]$_.OwningProcess; process = $(if ($p) { $p.ProcessName } else { $null }) }
         })
@@ -54,13 +56,13 @@
     }
 
     Read-Section 'local_admins' {
-        try { @(Get-LocalGroupMember -SID 'S-1-5-32-544' | ForEach-Object { $_.Name }) }
-        catch { @(net localgroup administrators | Select-Object -Skip 6 | Where-Object { $_ -and $_ -notmatch 'command completed' }) }
+        try { ,@(Get-LocalGroupMember -SID 'S-1-5-32-544' | ForEach-Object { $_.Name }) }
+        catch { ,@(net localgroup administrators | Select-Object -Skip 6 | Where-Object { $_ -and $_ -notmatch 'command completed' }) }
     }
 
     Read-Section 'disk_encryption' {
         if (-not (Get-Command Get-BitLockerVolume -ErrorAction SilentlyContinue)) { throw 'BitLocker is not installed on this server' }
-        @(Get-BitLockerVolume | ForEach-Object { [ordered]@{ volume = $_.MountPoint; encrypted = ([string]$_.ProtectionStatus -eq 'On') } })
+        ,@(Get-BitLockerVolume | ForEach-Object { [ordered]@{ volume = $_.MountPoint; encrypted = ([string]$_.ProtectionStatus -eq 'On') } })
     }
 
     Read-Section 'antivirus' {
@@ -75,11 +77,15 @@
 
     Read-Section 'av_exclusions' {
         if (-not $r.elevated) { throw 'Needs administrator rights' }
+        $mp = Get-MpComputerStatus -ErrorAction SilentlyContinue
+        if (-not ($mp -and $mp.AntivirusEnabled -and $mp.RealTimeProtectionEnabled)) {
+            throw 'Microsoft Defender is not the active antivirus; check the installed product''s exclusions by hand'
+        }
         $pref = Get-MpPreference
-        @($pref.ExclusionPath | Where-Object { $_ })
+        ,@($pref.ExclusionPath | Where-Object { $_ })
     }
 
-    $r.fms_data_paths = @('C:\Program Files\FileMaker\FileMaker Server\Data\Databases') | Where-Object { Test-Path $_ }
+    $r.fms_data_paths = @(@('C:\Program Files\FileMaker\FileMaker Server\Data\Databases') | Where-Object { Test-Path $_ })
 
     $json = $r | ConvertTo-Json -Depth 6 -Compress
     $bytes = [Text.Encoding]::UTF8.GetBytes($json)

@@ -64,7 +64,12 @@ def fetch_all(session, url):
                 entry = {"ok": False, "error": str(exc)}
                 continue
             if resp.status_code == 200:
-                entry = {"ok": True, "path": path, "data": resp.json().get("response", resp.json())}
+                try:
+                    body = resp.json()
+                except ValueError:
+                    entry = {"ok": False, "path": path, "status": 200, "error": "not a JSON response"}
+                    continue
+                entry = {"ok": True, "path": path, "data": body.get("response", body) if isinstance(body, dict) else body}
                 break
             entry = {"ok": False, "path": path, "status": resp.status_code}
         raw[name] = entry
@@ -151,14 +156,14 @@ def normalize(raw, host):
     if sched is not None:
         schedules = []
         for s in sched:
-            script = _get(s, "scriptType", "script", "systemScriptType") or {}
+            script = _get(s, "filemakerScriptType", "scriptType", "script", "systemScriptType", "scriptSequenceType") or {}
             schedules.append(
                 {
                     "name": _get(s, "name"),
                     "type": _get(s, "taskType", "type"),
                     "enabled": _get(s, "enabled", "status"),
-                    "account": _get(script, "fmScriptAccount", "account", "accountName") if isinstance(script, dict) else None,
-                    "last_result": _get(s, "lastError", "lastRunStatus", "status"),
+                    "account": _get(script, "fmScriptAccount", "scriptAccount", "account", "accountName") if isinstance(script, dict) else None,
+                    "last_result": _get(s, "lastError", "lastRunStatus", "lastResult", "status"),
                     "last_run": _get(s, "lastRun", "lastRunTime"),
                 }
             )
