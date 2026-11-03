@@ -39,7 +39,7 @@ If they get stuck, the human-readable version of all of this is `docs/consultant
 | Path | What it is |
 | --- | --- |
 | `README.md` | Start here (for people browsing GitHub) |
-| `docs/consultant-guide.html` | Step-by-step guide for consultants |
+| `docs/consultant-guide.html` | The whole consultant workflow on one page |
 | `docs/sample-report.html` | What the client receives (fictitious data) |
 | `.claude/skills/` | All skills. Claude Code loads them automatically; in Codex, read the `SKILL.md` for the step you're on |
 | `audit/` | Python package: collectors, XML parser, rules engine, report builder |
