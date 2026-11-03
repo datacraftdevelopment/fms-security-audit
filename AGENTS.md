@@ -66,7 +66,7 @@ Reference skills `fm-admin-reference`, `ottofms-reference` and `fm-xml-reference
 
 ## Status
 
-Version 0.1. The commands work and are tested against fictitious sample data (`python -m pytest`). They have not yet been run against a live FileMaker Server, a real Save as XML export, or a real Windows or Mac server, so:
+Version 0.1. The commands work and are tested against fictitious sample data (`python -m pytest`). The XML parser is tested against a scrubbed real FileMaker 26 export, and the Mac script has been run on a Mac workstation. They have not yet been run against a live FileMaker Server or a real Windows server, so:
 
 - If the Admin API returns fields the collector doesn't recognise, the affected checks show Not checked. Say so, and look at `server_raw.json` in the audit folder to see what came back.
 - If the XML parser finds no accounts, the export format may differ from what it expects. Don't guess at results; tell the consultant.

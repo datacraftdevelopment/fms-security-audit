@@ -2,6 +2,7 @@
 
 import datetime as dt
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -32,6 +33,11 @@ def load_rules():
             r["group"] = group
             meta[r["id"]] = r
     return meta
+
+
+def _key(name):
+    """The Admin API may list 'Contacts' while the export says 'Contacts.fmp12'; match them."""
+    return re.sub(r"\.fmp12$", "", str(name or "").strip(), flags=re.I).lower()
 
 
 def _read(folder, name):
@@ -72,23 +78,32 @@ def evaluate(ctx):
     for rid, fn in rules.OS.items():
         add(rid, "os", fn(ctx, meta[rid]["params"]))
 
-    hosted = [f["name"] for f in (ctx.server or {}).get("files") or []]
-    parsed = {f["name"]: f for f in ctx.files or []}
-    for name in hosted + [n for n in parsed if n not in hosted]:
-        f = parsed.get(name)
+    hosted = [f["name"] for f in (ctx.server or {}).get("files") or [] if f.get("name")]
+    parsed = {}
+    for f in ctx.files or []:
+        parsed.setdefault(_key(f["name"]), f)
+    seen = set()
+    for name in hosted + [f["name"] for f in ctx.files or []]:
+        k = _key(name)
+        if k in seen:
+            continue
+        seen.add(k)
+        f = parsed.get(k)
+        scope = f["name"] if f else name  # the export's name carries .fmp12 and is what the report lists
         for rid, fn in rules.FILES.items():
-            add(rid, name, fn(ctx, f, meta[rid]["params"]) if f else (rules.NC, "No XML export was provided for this file."))
+            add(rid, scope, fn(ctx, f, meta[rid]["params"]) if f else (rules.NC, "No XML export was provided for this file."))
     return results
 
 
 def compare(results, previous):
     """Mark each warn/fail as new or unchanged, and list what was fixed since the last audit."""
-    before = {(r["id"], r["scope"]): r["status"] for r in previous}
+    before = {(r["id"], _key(r["scope"])): r["status"] for r in previous}
+    now = {(r["id"], _key(r["scope"])): r["status"] for r in results}
     for r in results:
-        old = before.get((r["id"], r["scope"]))
+        old = before.get((r["id"], _key(r["scope"])))
         if r["status"] in ("warn", "fail"):
             r["change"] = "unchanged" if old in ("warn", "fail") else "new"
-    fixed = [r for r in previous if r["status"] in ("warn", "fail") and next((x["status"] for x in results if (x["id"], x["scope"]) == (r["id"], r["scope"])), None) == "pass"]
+    fixed = [r for r in previous if r["status"] in ("warn", "fail") and now.get((r["id"], _key(r["scope"]))) == "pass"]
     return fixed
 
 

@@ -136,10 +136,14 @@ def test_otto_html_catch_all_is_not_an_answer():
     assert ottofms._fetch(S(), "https://h", "/otto/api/nope")["ok"] is False
 
 
+FM26_FIXTURE = Path(__file__).parent / "fixtures" / "saxml-fm26-accounts.xml"
+
+
+@pytest.mark.skipif(not FM26_FIXTURE.exists(), reason="scrubbed FileMaker 26 export not present in tests/fixtures/")
 def test_real_fm26_export():
     from audit.parse import fm_xml
 
-    out = fm_xml.parse_file(Path(__file__).parent / "fixtures" / "saxml-fm26-accounts.xml")
+    out = fm_xml.parse_file(FM26_FIXTURE)
     accounts = {a["name"]: a for a in out["accounts"]}
     assert accounts["Admin"] == {"name": "Admin", "privilege_set": "[Full Access]", "active": True, "type": "FileMaker"}
     assert accounts["[Guest]"]["active"] is False and out["guest_enabled"] is False
@@ -147,3 +151,123 @@ def test_real_fm26_export():
     assert sets["[Data Entry Only]"]["broad_delete"] is True and sets["[Data Entry Only]"]["layouts_modify"] is False
     assert sets["[Full Access]"]["manage_accounts"] is True
     assert "PasswordEncrypted" not in str(out) and "REDACTED" not in str(out)
+
+
+# ---- regression tests for the 0.1 review
+
+
+def _ctx(**kw):
+    import datetime as dt
+
+    return engine.Context(answers=kw.pop("answers", {}), today=dt.date(2026, 10, 30), **kw)
+
+
+def _params(rid):
+    return engine.load_rules()[rid]["params"]
+
+
+def test_backup_rule_reads_numeric_error_codes():
+    from audit import rules
+
+    sched = [{"name": "Daily backup", "type": "BACKUP", "enabled": True, "last_result": 1}]
+    assert rules.srv_06(_ctx(server={"schedules": sched}), _params("SRV-06"))[0] == "fail"
+    sched[0]["last_result"] = 0
+    assert rules.srv_06(_ctx(server={"schedules": sched}), _params("SRV-06"))[0] == "pass"
+    sched[0]["last_result"] = None
+    status, text = rules.srv_06(_ctx(server={"schedules": sched}), _params("SRV-06"))
+    assert status == "pass" and "did not report" in text
+
+
+def test_script_schedule_rule_does_not_guess():
+    from audit import rules
+
+    scripts = [{"name": "Nightly import", "type": "FILEMAKER_SCRIPT", "enabled": True, "account": None}]
+    assert rules.srv_07(_ctx(server={"schedules": scripts}), _params("SRV-07"))[0] == "nc"
+    scripts[0]["account"] = "importer"
+    assert rules.srv_07(_ctx(server={"schedules": scripts}, files=None), _params("SRV-07"))[0] == "nc"
+    assert rules.srv_07(_ctx(server={"schedules": scripts}, files=[]), _params("SRV-07"))[0] == "pass"
+    scripts[0]["account"] = "Admin"
+    assert rules.srv_07(_ctx(server={"schedules": scripts}, files=None), _params("SRV-07"))[0] == "warn"
+
+
+def test_admin_api_maps_filemaker_script_type():
+    from audit.collect import admin_api
+
+    raw = {"schedules": {"ok": True, "data": {"schedules": [
+        {"name": "Nightly import", "taskType": "FILEMAKER_SCRIPT", "enabled": True, "filemakerScriptType": {"fmScriptAccount": "importer"}, "lastError": 0},
+    ]}}}
+    s = admin_api.normalize(raw, "h")["schedules"][0]
+    assert s["account"] == "importer" and s["last_result"] == 0
+
+
+def test_admin_api_tolerates_html_with_200():
+    from audit.collect import admin_api
+
+    class Resp:
+        status_code = 200
+
+        def json(self):
+            raise ValueError("not json")
+
+    class S:
+        def get(self, url):
+            return Resp()
+
+    raw = admin_api.fetch_all(S(), "https://h")
+    assert all(not v["ok"] for v in raw.values())
+
+
+def test_export_rule_needs_an_answer():
+    from audit import rules
+
+    f = {"name": "X.fmp12", "accounts": [], "privilege_sets": [{"name": "Staff", "export": True, "print": True, "ext_privs": []}], "guest_enabled": False}
+    assert rules.fil_06(_ctx(), f, _params("FIL-06"))[0] == "nc"
+    assert rules.fil_06(_ctx(answers={"export_denied_sets": ["Staff"]}), f, _params("FIL-06"))[0] == "warn"
+
+
+def test_os_block_scalars_become_lists():
+    from audit import rules
+
+    one = {"platform": "windows", "disk_encryption": {"volume": "C:", "encrypted": True}, "local_admins": "FMS01\\Administrator",
+           "av_exclusions": "C:\\FMS\\Data\\Databases", "fms_data_paths": "C:\\FMS\\Data\\Databases", "antivirus": {"products": {"name": "Defender", "running": True}}}
+    data = osdata.decode(osdata.encode(one))
+    assert data["local_admins"] == ["FMS01\\Administrator"] and data["disk_encryption"] == [{"volume": "C:", "encrypted": True}]
+    assert data["antivirus"]["products"][0]["name"] == "Defender"
+    assert rules.os_06(_ctx(os=data), _params("OS-06"))[1].startswith("1 member")
+    assert rules.os_07(_ctx(os=data), _params("OS-07"))[0] == "pass"
+    assert rules.os_09(_ctx(os=data), _params("OS-09"))[0] == "pass"
+
+
+def test_file_names_match_with_or_without_extension():
+    f = {"name": "Contacts.fmp12", "accounts": [{"name": "a", "privilege_set": "Staff", "active": True, "type": "FileMaker"}], "privilege_sets": [], "guest_enabled": False}
+    res = engine.evaluate(_ctx(server={"files": [{"name": "Contacts", "encrypted": True}]}, files=[f]))
+    assert {r["scope"] for r in res if r["group"] == "files"} == {"Contacts.fmp12"}
+    fixed = engine.compare([{"id": "FIL-03", "scope": "Contacts.fmp12", "status": "pass"}], [{"id": "FIL-03", "scope": "Contacts", "status": "fail"}])
+    assert len(fixed) == 1
+
+
+def test_parse_folder_deletes_nothing_when_one_export_is_bad(tmp_path):
+    xml = tmp_path / "xml"
+    xml.mkdir()
+    shutil.copy(SAMPLE / "xml" / "Contacts.xml", xml / "Contacts.xml")
+    (xml / "Zbroken.xml").write_text("<not closed")
+    with pytest.raises(Exception):
+        fm_xml.parse_folder(tmp_path)
+    assert sorted(p.name for p in xml.glob("*.xml")) == ["Contacts.xml", "Zbroken.xml"]
+
+
+def test_new_audit_quotes_client_name_and_sets_date(tmp_path, monkeypatch, capsys):
+    import argparse
+
+    import yaml
+
+    from audit import cli
+
+    shutil.copytree(ROOT / "audits" / "_template", tmp_path / "audits" / "_template")
+    monkeypatch.setattr(cli, "ROOT", tmp_path)
+    cli.cmd_new(argparse.Namespace(client='Acme "Widgets" & Sons: Ltd', server="fms.acme.test", date="2026-11-03"))
+    answers = yaml.safe_load((tmp_path / "audits" / "acme-widgets-sons-ltd" / "2026-11-03" / "answers.yaml").read_text())
+    assert answers["client"] == 'Acme "Widgets" & Sons: Ltd'
+    assert str(answers["audit_date"]) == "2026-11-03"
+    with pytest.raises(SystemExit):
+        cli.cmd_new(argparse.Namespace(client="Bad Date", server="h", date="3 Nov 2026"))

@@ -1,6 +1,7 @@
 # Answers the rules need. The agent fills this in with you at the start of the audit.
 client: ""
 server: ""
+audit_date: ""        # set by "audit new"; keeps date-based checks stable when the report is rebuilt later
 platform: ""            # windows or mac
 consultant: ""
 firm: ""                # shown in the disclaimer, e.g. RCC

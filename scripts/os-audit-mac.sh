@@ -9,8 +9,10 @@ s() { if [ -z "${1:-}" ]; then printf 'null'; else printf '"%s"' "$(esc "$1")"; 
 NC=""
 nc() { NC="${NC:+$NC,}\"$1\":\"$(esc "$2")\""; }
 
-echo "Administrator password (for read-only checks that need it; press Ctrl-C to skip):"
+echo "Administrator password (for read-only checks that need it; press Ctrl-C to skip them):"
+trap ':' INT   # Ctrl-C at the sudo prompt cancels sudo, not the whole script
 if sudo -v 2>/dev/null; then ELEV=true; SUDO="sudo -n"; else ELEV=false; SUDO=""; fi
+trap - INT
 
 OSJ="{\"name\":$(s "$(sw_vers -productName)"),\"version\":$(s "$(sw_vers -productVersion)"),\"build\":$(s "$(sw_vers -buildVersion)")}"
 
@@ -36,7 +38,8 @@ if [ "$ELEV" = true ]; then
 else nc pf "Needs administrator rights"; fi
 FW="{\"profiles\":[{\"name\":\"Application firewall\",\"enabled\":$AFE}],\"pf_enabled\":$PF,\"broad_allow_rules\":[]}"
 
-LAST=$(softwareupdate --history 2>/dev/null | grep -Eo '[0-9]{2}/[0-9]{2}/[0-9]{4}' | awk -F/ '{print $3"-"$1"-"$2}' | sort | tail -1)
+# The history prints dates as 2026-10-20 or 10/20/2026 depending on the locale.
+LAST=$(softwareupdate --history 2>/dev/null | grep -Eo '[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{2}/[0-9]{2}/[0-9]{4}' | awk -F/ 'NF==3 {print $3"-"$1"-"$2; next} {print}' | sort | tail -1)
 AUTO=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates 2>/dev/null)
 case "$AUTO" in 1) AUTO=true ;; 0) AUTO=false ;; *) AUTO=null ;; esac
 PAT="{\"last_installed\":$(s "$LAST"),\"auto_updates\":$AUTO}"
@@ -48,8 +51,13 @@ case "$(fdesetup status 2>/dev/null)" in *"is On"*) FV=true ;; *"is Off"*) FV=fa
 DISK="[{\"volume\":\"/\",\"encrypted\":$FV}]"
 
 AV="{\"name\":\"XProtect (built in)\",\"running\":true,\"signature_age_days\":null}"
-for p in Sophos CrowdStrike falcond SentinelOne Malwarebytes ESET Bitdefender "Trend Micro" McAfee Symantec Webroot Huntress; do
-  if pgrep -qif "$p"; then AV="$AV,{\"name\":$(s "$p"),\"running\":true,\"signature_age_days\":null}"; fi
+# Match vendor names as whole words in executable paths, not as substrings ("ESET" is inside "CascadeSets").
+PROCS=$(ps -axo comm= 2>/dev/null)
+for p in Sophos CrowdStrike falcond SentinelOne sentineld Malwarebytes ESET Bitdefender "Trend ?Micro" McAfee Symantec Webroot Huntress; do
+  if printf '%s\n' "$PROCS" | grep -Eiq "(^|[^[:alnum:]])${p}s?([^[:alnum:]]|$)"; then
+    label=$(printf '%s' "$p" | tr -d '?')
+    AV="$AV,{\"name\":$(s "$label"),\"running\":true,\"signature_age_days\":null}"
+  fi
 done
 nc av_exclusions "Not available on macOS; review manually"
 
