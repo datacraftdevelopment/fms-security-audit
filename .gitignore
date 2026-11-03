@@ -17,6 +17,7 @@ audits/*
 !tests/fixtures/**
 *.pdf
 !samples/**/*.pdf
+!docs/*.pdf
 
 # Python
 __pycache__/
